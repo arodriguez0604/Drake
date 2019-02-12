@@ -17,7 +17,7 @@ public:
     int resetLidar[LIDAR_COUNT];
     
     void init();
-    void continious();
+    void continuous();
 private:
     MicroLidar *microLidar;
     LineSensor *lineSensor;

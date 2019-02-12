@@ -21,7 +21,7 @@ void DalekShuffleboard::init() {
     frc::SmartDashboard::PutBoolean("Allow Lidar Reset", calibrateLidar);
 }
 
-void DalekShuffleboard::continious() {
+void DalekShuffleboard::continuous() {
     calibrateLidar = frc::SmartDashboard::GetBoolean("Allow Lidar Reset", false);
     if (calibrateLidar) {
         for (int i = 0; i < LIDAR_COUNT; i++) {

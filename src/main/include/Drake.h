@@ -13,6 +13,9 @@
 #include <ctre/Phoenix.h>
 #include "frc/smartdashboard/SmartDashboard.h"
 #include "DalekDrive.h"
+#include "MicroLidar.h"
+#include "DalekShuffleboard.h"
+#include "LineSensor.h"
 
 class Robot : public frc::TimedRobot {
  public:
@@ -31,4 +34,7 @@ private:
   rev::CANSparkMax *m_rightRear;
   frc::Joystick *m_leftStick;
   frc::Joystick *m_rightStick;
+  MicroLidar *microLidar;
+  LineSensor *lineSensor;
+  DalekShuffleboard *dalekShuffleboard;
 };
