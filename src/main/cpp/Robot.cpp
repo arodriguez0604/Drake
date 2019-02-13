@@ -23,6 +23,13 @@ Robot::RobotInit()
     microLidar->StartMeasurements();
     lineSensor = new LineSensor();
     dalekShuffleboard = new DalekShuffleboard(microLidar, lineSensor);
+{
+    m_drive = new DalekDrive(1, 2, 3, 4, DalekDrive::driveType::kMecanum);
+    m_leftStick = new frc::Joystick(1);
+    m_rightStick = new frc::Joystick(2);
+    m_fakeStick = new frc::Joystick(3);
+
+    //THIS IS JANE's Comment
 }
 
 void
@@ -72,6 +79,12 @@ Robot::TeleopPeriodic()
         else{
             m_drive->SetLeftRightMotorOutputs(0.0, 0.0);
         }
+    // m_drive->TankDrive(m_leftStick, m_rightStick);
+    //m_drive->Polar(m_leftStick, m_rightStick);
+    // m_drive->Cartesian(m_leftStick, m_rightStick, 0.0);
+
+    // New class for single-stick mecanum control
+    m_drive->Cartesian(m_leftStick, 0);
 }
 
 void

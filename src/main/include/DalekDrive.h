@@ -56,6 +56,8 @@ class DalekDrive {
 			double gyroAngle = 0.0);
 	void Cartesian(double ySpeed, double xSpeed, double zRotation,
 			double gyroAngle = 0.0);
+	void Cartesian(frc::Joystick& Stick,
+			double gyroAngle = 0.0);
 
 	void SetLeftRightMotorOutputs(double leftOutput, double rightOutput);
 	void SetInvertedMotor(int side, bool isInverted);

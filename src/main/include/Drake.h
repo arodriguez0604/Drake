@@ -37,4 +37,5 @@ private:
   MicroLidar *microLidar;
   LineSensor *lineSensor;
   DalekShuffleboard *dalekShuffleboard;
+  frc::Joystick *m_fakeStick;
 };

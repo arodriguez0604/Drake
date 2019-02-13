@@ -236,6 +236,15 @@ DalekDrive::Cartesian(double ySpeed, double xSpeed, double zRotation, double gyr
 	}
 }
 
+void 
+DalekDrive::Cartesian(frc::Joystick& Stick, double gyroAngle)
+{
+	if(m_type == DalekDrive::driveType::kMecanum) {
+		m_mecanum->DriveCartesian(Stick.GetX(), Stick.GetY(), Stick.GetTwist(),
+			gyroAngle);
+	}
+}
+	
 void
 DalekDrive::SetInvertedMotor(int side, bool isInverted)
 {
