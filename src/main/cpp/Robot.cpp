@@ -13,9 +13,10 @@
 void
 Robot::RobotInit() 
 {  
-    m_drive = new DalekDrive(1, 2, 3, 4, DalekDrive::driveType::kDifferential);
+    m_drive = new DalekDrive(1, 2, 3, 4, DalekDrive::driveType::kMecanum);
     m_leftStick = new frc::Joystick(0);
     m_rightStick = new frc::Joystick(1);
+    m_fakeStick = new frc::Joystick(2);
     microLidar = new MicroLidar("/dev/i2c-2", MicroLidar::CONTINUOUS_MEASURE_MODE);
     for(int i = 0; i < LIDAR_COUNT; i++)
         microLidar->Add(i);
@@ -23,13 +24,6 @@ Robot::RobotInit()
     microLidar->StartMeasurements();
     lineSensor = new LineSensor();
     dalekShuffleboard = new DalekShuffleboard(microLidar, lineSensor);
-{
-    m_drive = new DalekDrive(1, 2, 3, 4, DalekDrive::driveType::kMecanum);
-    m_leftStick = new frc::Joystick(1);
-    m_rightStick = new frc::Joystick(2);
-    m_fakeStick = new frc::Joystick(3);
-
-    //THIS IS JANE's Comment
 }
 
 void
@@ -58,15 +52,15 @@ void
 Robot::TeleopPeriodic()
 {
     // pick one to test, all should in principle work for the mecanum wheels
-    //m_drive->TankDrive(m_leftStick, m_rightStick, false);
-    //m_drive->Polar(m_leftStick, m_rightStick);
-    //m_drive->Cartesian(m_leftStick, m_rightStick, 0.0);
-    //m_drive->SetLeftRightMotorOutputs(m_leftStick->GetY(), -m_rightStick->GetY());
-    	//for(int i = 0; i < 9; i++){
-           bool line = lineSensor->getLineSensor(1);
-
-            //std::cout << "Value: " << line << "\n";
-       // }
+    // m_drive->TankDrive(m_leftStick, m_rightStick, false);
+    // m_drive->Polar(m_leftStick, m_rightStick);
+    // m_drive->Cartesian(m_leftStick, m_rightStick, 0.0);
+    // m_drive->SetLeftRightMotorOutputs(m_leftStick->GetY(), -m_rightStick->GetY());
+    
+    // New class for single-stick mecanum control
+    m_drive->Cartesian(m_leftStick, 0);
+    
+    bool line = lineSensor->getLineSensor(1);
         
         if(m_leftStick->GetTrigger()){
             if(!line){
@@ -79,12 +73,6 @@ Robot::TeleopPeriodic()
         else{
             m_drive->SetLeftRightMotorOutputs(0.0, 0.0);
         }
-    // m_drive->TankDrive(m_leftStick, m_rightStick);
-    //m_drive->Polar(m_leftStick, m_rightStick);
-    // m_drive->Cartesian(m_leftStick, m_rightStick, 0.0);
-
-    // New class for single-stick mecanum control
-    m_drive->Cartesian(m_leftStick, 0);
 }
 
 void
