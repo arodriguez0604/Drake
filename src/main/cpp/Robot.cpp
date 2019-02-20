@@ -33,13 +33,15 @@ Robot::RobotInit()
     microLidar->StartMeasurements();
     lineSensor = new LineSensor();
     dalekShuffleboard = new DalekShuffleboard(microLidar, lineSensor);
+    
+    // CameraServer::GetInstance()->StartAutomaticCapture();
 }
 
 void
 Robot::RobotPeriodic() 
 {
-   microLidar->PollDevices();
-   dalekShuffleboard->continious();
+    microLidar->PollDevices();
+    dalekShuffleboard->continious();
 }
 
 void
