@@ -26,6 +26,7 @@ class Robot : public frc::TimedRobot {
   void TeleopInit() override;
   void TeleopPeriodic() override;
   void TestPeriodic() override;
+  void VisionThread();
 private:
   DalekDrive *m_drive;
   frc::Joystick *m_leftStick;
@@ -35,4 +36,5 @@ private:
   DalekShuffleboard *dalekShuffleboard;
 
   AnalogPotentiometer *pot;
+  cs::UsbCamera camera;
 };

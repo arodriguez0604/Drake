@@ -12,6 +12,7 @@ DalekShuffleboard::~DalekShuffleboard() {
 
 
 void DalekShuffleboard::init() {
+    
 
     for (int i = 0; i < LIDAR_COUNT; i++) {
         std::string temp = "Lidar " + std::to_string(i) + " Reset";
@@ -35,10 +36,10 @@ void DalekShuffleboard::continious() {
         }
     }
 
-    /*for (int i = 0; i < LIDAR_COUNT; i++) {
+    for (int i = 0; i < LIDAR_COUNT; i++) {
         std::string temp = "Lidar Sensor: " + std::to_string(i);
         frc::SmartDashboard::PutNumber(temp, microLidar->GetMeasurement(i));
-    }*/ 
+    }
     
     for (int i = 0; i < LINE_SENSOR_COUNT; i++) {
         std::string temp = "Line Sensor: "+ std::to_string(i);

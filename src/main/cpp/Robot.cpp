@@ -25,6 +25,8 @@ Robot::RobotInit()
     lineSensor = new LineSensor();
     dalekShuffleboard = new DalekShuffleboard(microLidar, lineSensor);
     pot = new AnalogPotentiometer(0, 360.0, 0.0);
+    
+    //CameraServer::GetInstance()->StartAutomaticCapture();
 }
 
 void
