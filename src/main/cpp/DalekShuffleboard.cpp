@@ -12,6 +12,7 @@ DalekShuffleboard::~DalekShuffleboard() {
 
 
 void DalekShuffleboard::init() {
+    
 
     for (int i = 0; i < LIDAR_COUNT; i++) {
         std::string temp = "Lidar " + std::to_string(i) + " Reset";

@@ -33,7 +33,6 @@ Robot::RobotInit()
     microLidar->StartMeasurements();
     lineSensor = new LineSensor();
     dalekShuffleboard = new DalekShuffleboard(microLidar, lineSensor);
-
 }
 
 void
