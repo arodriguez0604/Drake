@@ -240,7 +240,7 @@ void
 DalekDrive::Cartesian(frc::Joystick& Stick, double gyroAngle)
 {
 	if(m_type == DalekDrive::driveType::kMecanum) {
-		m_mecanum->DriveCartesian(Stick.GetX(), Stick.GetY(), Stick.GetTwist(),
+		m_mecanum->DriveCartesian(DeadZone(Stick.GetX(), .3) * .5, DeadZone(Stick.GetY(), .3) * -.5, DeadZone(Stick.GetTwist(), .3) * .2,
 			gyroAngle);
 	}
 }
@@ -277,29 +277,38 @@ DalekDrive::InitDalekDrive(void)
     m_leftMotor[FRONT]->SetCANTimeout(CAN_TIMEOUT);
 	m_leftMotor[FRONT]->SetIdleMode(CANSparkMax::IdleMode::kBrake);
     m_leftMotor[FRONT]->SetSmartCurrentLimit(STALL_LIMIT, FREE_LIMIT, 0);
-	m_leftMotor[FRONT]->SetRampRate(RAMP_RATE);
-	m_leftMotor[FRONT]->SetInverted(true);
+	m_leftMotor[FRONT]->SetOpenLoopRampRate(RAMP_RATE);                  // used to be SetRampRate... update i guess... check if this is oprn or closed
+	m_leftMotor[FRONT]->SetInverted(false);
 
     m_rightMotor[FRONT]->SetCANTimeout(CAN_TIMEOUT);
 	m_rightMotor[FRONT]->SetIdleMode(CANSparkMax::IdleMode::kBrake);
     m_rightMotor[FRONT]->SetSmartCurrentLimit(STALL_LIMIT, FREE_LIMIT, 0);
-	m_rightMotor[FRONT]->SetRampRate(RAMP_RATE);
-	m_rightMotor[FRONT]->SetInverted(true);
+	m_rightMotor[FRONT]->SetOpenLoopRampRate(RAMP_RATE);                // same
+	m_rightMotor[FRONT]->SetInverted(false);
 
     m_leftMotor[REAR]->SetCANTimeout(CAN_TIMEOUT);
   	m_leftMotor[REAR]->SetIdleMode(CANSparkMax::IdleMode::kBrake);
     m_leftMotor[REAR]->SetSmartCurrentLimit(STALL_LIMIT, FREE_LIMIT, 0);
-	m_leftMotor[REAR]->SetRampRate(RAMP_RATE);
-	m_leftMotor[REAR]->SetInverted(true);
+	m_leftMotor[REAR]->SetOpenLoopRampRate(RAMP_RATE);                  // same
+	m_leftMotor[REAR]->SetInverted(false);
 
     m_rightMotor[REAR]->SetCANTimeout(CAN_TIMEOUT);
 	m_rightMotor[REAR]->SetIdleMode(CANSparkMax::IdleMode::kBrake);
     m_rightMotor[REAR]->SetSmartCurrentLimit(STALL_LIMIT, FREE_LIMIT, 0);
-	m_rightMotor[REAR]->SetRampRate(RAMP_RATE);
-	m_rightMotor[REAR]->SetInverted(true);
+	m_rightMotor[REAR]->SetOpenLoopRampRate(RAMP_RATE);                 // same
+	m_rightMotor[REAR]->SetInverted(false);
 
     m_leftMotor[FRONT]->StopMotor();  m_leftMotor[REAR]->StopMotor();
     m_rightMotor[FRONT]->StopMotor(); m_rightMotor[REAR]->StopMotor();
+}
+
+float
+DalekDrive::DeadZone(float input, float range) {
+    if (abs(input) < range) {
+        return 0;
+    } else {
+        return input;
+    }
 }
 
 void

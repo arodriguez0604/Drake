@@ -6,6 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 
+// check comments in arm cpp lines 1&2
+// check comments in dalekdrive cpp line 280
+
 #include <iostream>
 #include "Drake.h"
 
@@ -13,10 +16,18 @@
 void
 Robot::RobotInit() 
 {  
-    m_drive = new DalekDrive(1, 2, 3, 4, DalekDrive::driveType::kMecanum);
-    m_leftStick = new frc::Joystick(0);
-    m_rightStick = new frc::Joystick(1);
-    m_fakeStick = new frc::Joystick(2);
+    m_drive      = new DalekDrive(1, 2, 3, 4, DalekDrive::driveType::kMecanum);
+    m_leftStick  = new frc::Joystick(1);
+    //m_rightStick = new frc::Joystick(2);
+    m_xbox       = new frc::XboxController(3);
+    m_dPad[R]    = new frc::POVButton(*m_xbox, 0);
+    m_dPad[T]    = new frc::POVButton(*m_xbox, 90);
+    m_dPad[L]    = new frc::POVButton(*m_xbox, 180);
+    m_dPad[B]    = new frc::POVButton(*m_xbox, 270);
+
+    m_arm = new Arm(SHOULDER_MOTOR, ELBOW_MOTOR, TURRET_MOTOR, 0);
+    m_claw = new Claw(CLAW_MOTOR, 0);
+
     microLidar = new MicroLidar("/dev/i2c-2", MicroLidar::CONTINUOUS_MEASURE_MODE);
     for(int i = 0; i < LIDAR_COUNT; i++)
         microLidar->Add(i);
@@ -56,12 +67,16 @@ Robot::TeleopPeriodic()
     // m_drive->Polar(m_leftStick, m_rightStick);
     // m_drive->Cartesian(m_leftStick, m_rightStick, 0.0);
     // m_drive->SetLeftRightMotorOutputs(m_leftStick->GetY(), -m_rightStick->GetY());
-    
-    // New class for single-stick mecanum control
-    m_drive->Cartesian(m_leftStick, 0);
-    
+
+    m_drive->Cartesian(*m_leftStick, 0.0);
+    m_claw->Tick(m_xbox);
+    m_arm->Tick(m_xbox, m_dPad);
+
+    //Motor Voltage values
+    m_arm->printVoltage(m_leftStick);
+    m_claw->printVoltage();
     bool line = lineSensor->getLineSensor(1);
-        
+        /*
         if(m_leftStick->GetTrigger()){
             if(!line){
                 m_drive->SetLeftRightMotorOutputs(0.5, -0.5);
@@ -72,7 +87,7 @@ Robot::TeleopPeriodic()
         }
         else{
             m_drive->SetLeftRightMotorOutputs(0.0, 0.0);
-        }
+        }*/
 }
 
 void
