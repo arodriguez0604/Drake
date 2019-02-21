@@ -34,10 +34,12 @@
 #include <stdlib.h>
 #endif
 
-#define LOG_FUNCTION_START(fmt, ...) \
+#define LOG_FUNCTION_START(); \
+	_LOG_FUNCTION_START(TRACE_MODULE_API, "", "")
+#define LOG_FUNCTION_START_WITH_ARGS(fmt, ...) \
 	_LOG_FUNCTION_START(TRACE_MODULE_API, fmt, ##__VA_ARGS__)
-#define LOG_FUNCTION_END(status, ...) \
-	_LOG_FUNCTION_END(TRACE_MODULE_API, status, ##__VA_ARGS__)
+#define LOG_FUNCTION_END(status) \
+	_LOG_FUNCTION_END(TRACE_MODULE_API, status, "")
 #define LOG_FUNCTION_END_FMT(status, fmt, ...) \
 	_LOG_FUNCTION_END_FMT(TRACE_MODULE_API, status, fmt, ##__VA_ARGS__)
 
@@ -295,7 +297,7 @@ VL53L0X_Error VL53L0X_set_offset_calibration_data_micro_meter(VL53L0X_DEV Dev,
 	int16_t cOffsetRange = 4096;
 	uint32_t encodedOffsetVal;
 
-	LOG_FUNCTION_START("");
+	LOG_FUNCTION_START();
 
 	if (OffsetCalibrationDataMicroMeter > cMaxOffsetMicroMeter)
 		OffsetCalibrationDataMicroMeter = cMaxOffsetMicroMeter;

@@ -1,19 +1,19 @@
 #include "DalekShuffleboard.h"
 
-DalekShuffleboard::DalekShuffleboard(MicroLidar *microLidar, LineSensor *lineSensor) {
+DalekShuffleboard::DalekShuffleboard(MicroLidar *microLidar, LineSensor *lineSensor) 
+{
     this->microLidar = microLidar;
     this->lineSensor = lineSensor;
     init();
 }
-DalekShuffleboard::~DalekShuffleboard() {
 
+DalekShuffleboard::~DalekShuffleboard()
+{
 }
 
-
-
-void DalekShuffleboard::init() {
-    
-
+void
+DalekShuffleboard::init()
+{
     for (int i = 0; i < LIDAR_COUNT; i++) {
         std::string temp = "Lidar " + std::to_string(i) + " Reset";
         frc::SmartDashboard::PutBoolean(temp, resetLidar[i]);
@@ -22,7 +22,8 @@ void DalekShuffleboard::init() {
     frc::SmartDashboard::PutBoolean("Allow Lidar Reset", calibrateLidar);
 }
 
-void DalekShuffleboard::continious() {
+void DalekShuffleboard::continious()
+{
     calibrateLidar = frc::SmartDashboard::GetBoolean("Allow Lidar Reset", false);
     if (calibrateLidar) {
         for (int i = 0; i < LIDAR_COUNT; i++) {
