@@ -10,9 +10,6 @@ Arm::Arm(int shoulderMotor, int elbowMotor, int turretMotor, int shoulderPot)
     m_shoulderPot          = new AnalogPotentiometer(shoulderPot, 1.0, 0.0);
     m_shoulderMotorEncoder = new CANEncoder(*m_shoulderMotor);
     ArmInit();
-    curX = 0;
-    curY = 0;
-    shoulderAngle = M_PI / 2;
 }
 
 Arm::Arm(CANSparkMax *shoulderMotor, WPI_TalonSRX *elbowMotor, WPI_TalonSRX *turretMotor, AnalogPotentiometer *shoulderPot)
@@ -23,8 +20,7 @@ Arm::Arm(CANSparkMax *shoulderMotor, WPI_TalonSRX *elbowMotor, WPI_TalonSRX *tur
     m_shoulderPot          = shoulderPot;
     m_shoulderMotorEncoder = new CANEncoder(*m_shoulderMotor);
     ArmInit();
-    curX = 0;
-    curY = 0;
+    
 }
 
 void
@@ -37,6 +33,10 @@ Arm::ArmInit()
 	m_elbowMotor->Config_kP(0, 0.3, 0);
 	m_elbowMotor->Config_kI(0, 0.0, 0);
     m_elbowMotor->Config_kD(0, 0.2, 0);
+    turretReset = false;
+    curX = 0;
+    curY = 0;
+    // set shoulder motor, prob to fetal position
 }
 float
 Arm::DeadZone(float input, float range) {
@@ -49,10 +49,14 @@ Arm::DeadZone(float input, float range) {
 
 void Arm::Tick(XboxController *xbox, POVButton *dPad[])
 {
-    // m_turretMotor->Set(DeadZone(xbox->GetX(GenericHID::JoystickHand::kRightHand), .3) * .5);
+    float turretMove = DeadZone(xbox->GetX(GenericHID::JoystickHand::kRightHand), .3) * .5;
+    if (turretMove != 0) {
+        turretReset = false;
+    }
     float x = 0;
     float y = 0;
     bool move = true;
+    // either call moveToPosition after this string of if-statements or change the angles in the ifs
     if (xbox->GetAButton()) {
         if (dPad[R]->Get()) {
             x = defaultX;
@@ -110,11 +114,17 @@ void Arm::Tick(XboxController *xbox, POVButton *dPad[])
             // moveToPosition(x, y);
         }
     }
-    // m_shoulderMotor->Set(DeadZone(xbox->GetY(GenericHID::JoystickHand::kLeftHand), .3) * .3);
+    if (move) {
+        turretReset = true;
+        // same loop as the shoulder but using turret values to get it to the exact center
+    } else {
+        // m_turretMotor->Set(turretReset);
+    }
+
+    // these below ar just for testing
+    m_shoulderMotor->Set(DeadZone(xbox->GetY(GenericHID::JoystickHand::kLeftHand), .3) * .3);
     // cout << m_shoulderPot->Get() << "\n";
     // m_elbowMotor->Set(DeadZone(xbox->GetY(GenericHID::JoystickHand::kRightHand), .1) * .35);
-
-    m_turretMotor->Set(DeadZone(xbox->GetY(GenericHID::JoystickHand::kLeftHand), .3) * .6);
 
     // SetMotors();
 }

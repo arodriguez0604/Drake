@@ -49,6 +49,7 @@ using namespace frc;
 class Arm {
   public:
     float shoulderAngle, elbowAngle, curX, curY;
+    bool turretReset;
 
     Arm(int shoulderMotor, int elbowMotor, int turretMotor, int shoulderPot);
     Arm(CANSparkMax *shoulderMotor, WPI_TalonSRX *elbowMotor, WPI_TalonSRX *turretMotor, AnalogPotentiometer *shoulderPot);
