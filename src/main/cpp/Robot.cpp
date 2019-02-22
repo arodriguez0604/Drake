@@ -28,20 +28,31 @@ Robot::RobotInit()
     m_arm = new Arm(SHOULDER_MOTOR, ELBOW_MOTOR, TURRET_MOTOR, 0);
     m_claw = new Claw(CLAW_MOTOR, 0);
 
+#if USE_LIDAR
     microLidar = new MicroLidar("/dev/i2c-2", MicroLidar::CONTINUOUS_MEASURE_MODE);
-    for(int i = 0; i < LIDAR_COUNT; i++)
-        microLidar->Add(i);
-    microLidar->InitSensors();
-    microLidar->StartMeasurements();
+    if (!microLidar) {
+        for (int i = 0; i < LIDAR_COUNT; i++) {
+            microLidar->Add(i);
+        }
+        microLidar->InitSensors();
+        microLidar->StartMeasurements();
+    }
+    else {
+        std::cout << "Failed to initialize microLidars\n";
+    }
+#endif
     lineSensor = new LineSensor();
     dalekShuffleboard = new DalekShuffleboard(microLidar, lineSensor);
+    // CameraServer::GetInstance()->StartAutomaticCapture();
 }
 
 void
 Robot::RobotPeriodic() 
 {
+#if USE_LIDAR
     microLidar->PollDevices();
-    dalekShuffleboard->continuous();
+#endif
+    dalekShuffleboard->continious();
 }
 
 void
@@ -75,11 +86,12 @@ Robot::TeleopPeriodic()
     //Motor Voltage values
     m_arm->printVoltage(m_leftStick);
     m_claw->printVoltage();
-    bool line = lineSensor->getLineSensor(1);
-        /*
+
+    /*bool line = lineSensor->getLineSensor(1);
+        
         if(m_leftStick->GetTrigger()){
             if(!line){
-                m_drive->SetLeftRightMotorOutputs(0.5, -0.5);
+                m_drive->SetLeftRightMotorOutputs(0.05, -0.05);
             }
             else{
                 m_drive->SetLeftRightMotorOutputs(0.0, 0.0);
@@ -93,6 +105,7 @@ Robot::TeleopPeriodic()
 void
 Robot::TestPeriodic()
 {
+
 }
 
 #ifndef RUNNING_FRC_TESTS

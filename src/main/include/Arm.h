@@ -33,7 +33,7 @@ using namespace std;
 #define cargoBallLength           750                    // i made this up
 #define rocketHatchLowHeight       495  // check   3
 #define rocketBallLowHeight       683//           4
-#define rocketHatchMiddleHeight    1168//          5
+#define rocketHatchMiddleHeight    1168//          (5) 1193.8mm
 #define rocketBallMiddleHeight    1422//          6
 #define rocketHatchTopHeight       1867//          7
 #define rocketBallTopHeight       2083//          8

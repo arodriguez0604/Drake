@@ -1,14 +1,17 @@
 #include "LineSensor.h"
 
-LineSensor::LineSensor() {
+LineSensor::LineSensor()
+{
     init();
 }
-LineSensor::~LineSensor() {
 
+LineSensor::~LineSensor()
+{
 }
 
-
-void LineSensor::init() {
+void
+LineSensor::init() 
+{
     digitalInputArray[0] = new frc::DigitalInput(10);
     digitalInputArray[1] = new frc::DigitalInput(11);
     digitalInputArray[2] = new frc::DigitalInput(12);
@@ -20,7 +23,8 @@ void LineSensor::init() {
     digitalInputArray[8] = new frc::DigitalInput(22);
 }
 
-
-bool LineSensor::getLineSensor(int lineSensorNumber) {
+bool
+LineSensor::getLineSensor(int lineSensorNumber)
+{
     return !digitalInputArray[lineSensorNumber]->Get();
 }

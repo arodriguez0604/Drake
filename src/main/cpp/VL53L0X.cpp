@@ -80,7 +80,7 @@ bool VL53L0X::_Init(int I2cAddr)
     MyDevice.I2cDevAddr = I2cAddr;
 
     // Setup comms to the temporary device
-    if(_i2c_init(&TempDevice, "/dev/i2c-2", TempDevice.I2cDevAddr) < 0) 
+    if(_i2c_init(&TempDevice, (char *)"/dev/i2c-2", TempDevice.I2cDevAddr) < 0) 
     {
         Status = VL53L0X_ERROR_CONTROL_INTERFACE;
         return false;
@@ -100,7 +100,7 @@ bool VL53L0X::_Init(int I2cAddr)
     Timer.wait_BLOCKING(VL53L0X_SETTLE_TIMEDELAY);
 
     // Now we need to initialize comms to the i2c device we'll use
-    if(_i2c_init(&MyDevice, "/dev/i2c-2", (uint32_t)MyDevice.I2cDevAddr) < 0) 
+    if(_i2c_init(&MyDevice, (char *)"/dev/i2c-2", (uint32_t)MyDevice.I2cDevAddr) < 0) 
     {
         Status = VL53L0X_ERROR_CONTROL_INTERFACE;
         return false;

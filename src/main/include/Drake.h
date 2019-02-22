@@ -19,6 +19,10 @@
 #include "LineSensor.h"
 #include "Arm.h"
 #include "Claw.h"
+#include "MicroLidar.h"
+#include "DalekShuffleboard.h"
+#include "LineSensor.h"
+
 
 class Robot : public frc::TimedRobot {
  public:

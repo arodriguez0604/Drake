@@ -50,7 +50,6 @@ model {
             if (includeDesktopSupport) {
                 targetPlatform wpi.platforms.desktop
             }
-
             sources.cpp {
                 source {
                     srcDir 'src/main/cpp'

@@ -214,7 +214,8 @@ DalekDrive::Cartesian(frc::GenericHID* leftStick, frc::GenericHID* rightStick,
 			double gyroAngle)
 {
 	if(m_type == DalekDrive::driveType::kMecanum) {
-		m_mecanum->DriveCartesian(leftStick->GetY(), leftStick->GetX(), rightStick->GetX(), gyroAngle);
+		m_mecanum->DriveCartesian(rightStick->GetX(), rightStick->GetY(), leftStick->GetY(),
+			gyroAngle);
 	}
 }
 

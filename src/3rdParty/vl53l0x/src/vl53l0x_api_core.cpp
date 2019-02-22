@@ -34,10 +34,12 @@
 #ifndef __KERNEL__
 #include <stdlib.h>
 #endif
-#define LOG_FUNCTION_START(fmt, ...) \
+#define LOG_FUNCTION_START(); \
+	_LOG_FUNCTION_START(TRACE_MODULE_API, "", "")
+#define LOG_FUNCTION_START_WITH_ARGS(fmt, ...) \
 	_LOG_FUNCTION_START(TRACE_MODULE_API, fmt, ##__VA_ARGS__)
-#define LOG_FUNCTION_END(status, ...) \
-	_LOG_FUNCTION_END(TRACE_MODULE_API, status, ##__VA_ARGS__)
+#define LOG_FUNCTION_END(status) \
+	_LOG_FUNCTION_END(TRACE_MODULE_API, status, "")
 #define LOG_FUNCTION_END_FMT(status, fmt, ...) \
 	_LOG_FUNCTION_END_FMT(TRACE_MODULE_API, status, fmt, ##__VA_ARGS__)
 
@@ -64,7 +66,7 @@ VL53L0X_Error VL53L0X_measurement_poll_for_completion(VL53L0X_DEV Dev)
 	uint8_t NewDataReady = 0;
 	uint32_t LoopNb;
 
-	LOG_FUNCTION_START("");
+	LOG_FUNCTION_START();
 
 	LoopNb = 0;
 
@@ -180,7 +182,7 @@ VL53L0X_Error VL53L0X_device_read_strobe(VL53L0X_DEV Dev)
 	VL53L0X_Error Status = VL53L0X_ERROR_NONE;
 	uint8_t strobe;
 	uint32_t LoopNb;
-	LOG_FUNCTION_START("");
+	LOG_FUNCTION_START();
 
 	Status |= VL53L0X_WrByte(Dev, 0x83, 0x00);
 
@@ -233,7 +235,7 @@ VL53L0X_Error VL53L0X_get_info_from_device(VL53L0X_DEV Dev, uint8_t option)
 	int i;
 
 
-	LOG_FUNCTION_START("");
+	LOG_FUNCTION_START();
 
 	ReadDataFromDeviceDone = VL53L0X_GETDEVICESPECIFICPARAMETER(Dev,
 			ReadDataFromDeviceDone);
@@ -481,7 +483,7 @@ uint32_t VL53L0X_calc_macro_period_ps(VL53L0X_DEV Dev, uint8_t vcsel_period_pclk
 	uint32_t macro_period_vclks;
 	uint32_t macro_period_ps;
 
-	LOG_FUNCTION_START("");
+	LOG_FUNCTION_START();
 
 	/* The above calculation will produce rounding errors,
 	   therefore set fixed value
@@ -1126,7 +1128,7 @@ VL53L0X_Error VL53L0X_set_measurement_timing_budget_micro_seconds(VL53L0X_DEV De
 	uint32_t cMinTimingBudgetMicroSeconds	= 20000;
 	uint32_t SubTimeout = 0;
 
-	LOG_FUNCTION_START("");
+	LOG_FUNCTION_START();
 
 	if (MeasurementTimingBudgetMicroSeconds
 			< cMinTimingBudgetMicroSeconds) {
@@ -1274,7 +1276,7 @@ VL53L0X_Error VL53L0X_get_measurement_timing_budget_micro_seconds(VL53L0X_DEV De
 	uint32_t FinalRangeOverheadMicroSeconds = 550;
 	uint32_t PreRangeTimeoutMicroSeconds	= 0;
 
-	LOG_FUNCTION_START("");
+	LOG_FUNCTION_START();
 
 	/* Start and end overhead times always present */
 	*pMeasurementTimingBudgetMicroSeconds
@@ -1363,7 +1365,7 @@ VL53L0X_Error VL53L0X_load_tuning_settings(VL53L0X_DEV Dev,
 	uint8_t localBuffer[4]; /* max */
 	uint16_t Temp16;
 
-	LOG_FUNCTION_START("");
+	LOG_FUNCTION_START();
 
 	Index = 0;
 
@@ -1478,7 +1480,7 @@ VL53L0X_Error VL53L0X_get_total_signal_rate(VL53L0X_DEV Dev,
 	VL53L0X_Error Status = VL53L0X_ERROR_NONE;
 	FixPoint1616_t totalXtalkMegaCps;
 
-	LOG_FUNCTION_START("");
+	LOG_FUNCTION_START();
 
 	*ptotal_signal_rate_mcps =
 		pRangingMeasurementData->SignalRateRtnMegaCps;
@@ -1526,7 +1528,7 @@ VL53L0X_Error VL53L0X_calc_dmax(
 
 	VL53L0X_Error Status = VL53L0X_ERROR_NONE;
 
-	LOG_FUNCTION_START("");
+	LOG_FUNCTION_START();
 
 	dmaxCalRange_mm =
 		PALDevDataGet(Dev, DmaxCalRangeMilliMeter);
@@ -1753,7 +1755,7 @@ VL53L0X_Error VL53L0X_calc_sigma_estimate(VL53L0X_DEV Dev,
 	 *	- SigmaEstEffAmbWidth
 	 */
 
-	LOG_FUNCTION_START("");
+	LOG_FUNCTION_START();
 
 	VL53L0X_GETPARAMETERFIELD(Dev, XTalkCompensationRateMegaCps,
 			xTalkCompRate_mcps);
@@ -2049,7 +2051,7 @@ VL53L0X_Error VL53L0X_get_pal_range_status(VL53L0X_DEV Dev,
 	uint32_t Dmax_mm = 0;
 	FixPoint1616_t LastSignalRefMcps;
 
-	LOG_FUNCTION_START("");
+	LOG_FUNCTION_START();
 
 
 	/*
