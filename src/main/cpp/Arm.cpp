@@ -28,21 +28,32 @@ Arm::ArmInit()
 {
     // needed to configure the talon to make sure things are ready for position mode
     m_elbowMotor->ConfigSelectedFeedbackSensor(FeedbackDevice::Analog, 0, 0);
-    m_elbowMotor->SetSensorPhase(false);
+    m_elbowMotor->SetSensorPhase(false); // Need to test this value for black bot
     m_elbowMotor->ConfigFeedbackNotContinuous(true);
-    m_elbowMotor->ConfigAllowableClosedloopError(0, 10, 0);
+    m_elbowMotor->ConfigAllowableClosedloopError(0, 0, 0);
     m_elbowMotor->Config_IntegralZone(0, 20.0, 0);
     m_elbowMotor->Config_kF(0, 0.0, 0);
-	m_elbowMotor->Config_kP(0, 3.2, 0);
+	m_elbowMotor->Config_kP(0, 7.2, 0);
 	m_elbowMotor->Config_kI(0, 0.0, 0);
-    m_elbowMotor->Config_kD(0, 1.0, 0);
+    m_elbowMotor->Config_kD(0, 2.5, 0);
+
+    //find the location soon and set it
+    curX = 609.6; // This is temporary
+    curY = 914.4; // Same
+    moveToPosition(curX, curY);
+    turretReset = true;
 }
 float
 Arm::DeadZone(float input, float range) {
     if (abs(input) < range) {
         return 0;
     } else {
-        return input;
+        if(input > 0) {
+            return (input - range) / (1 - range);
+        }
+        else {
+            return -1 * (abs(input) - range) / (1-range);
+        }
     }
 }
 
@@ -52,10 +63,10 @@ void Arm::Tick(XboxController *xbox, POVButton *dPad[])
     if (turretMove != 0) {
         turretReset = false;
     }
-    float x = 0;
-    float y = 0;
+    float x = curX;
+    float y = curY;
     bool move = true;
-    // either call moveToPosition after this string of if-statements or change the angles in the ifs
+    //set angles in if statments
     if (xbox->GetAButton()) {
         if (dPad[R]->Get()) {
             x = defaultX;
@@ -103,29 +114,23 @@ void Arm::Tick(XboxController *xbox, POVButton *dPad[])
     } else if (xbox->GetTriggerAxis(GenericHID::JoystickHand::kRightHand) > .1) {
         // FETAL POSITION
     } else {
-        float xShift = DeadZone(xbox->GetY(GenericHID::JoystickHand::kRightHand), .4) * .5; // .5 is a guess... fix in testing
-        float yShift = DeadZone(xbox->GetY(GenericHID::JoystickHand::kLeftHand), .4) * .5;  // same as above
+        //X be whack
+        float xShift = DeadZone(xbox->GetY(GenericHID::JoystickHand::kRightHand), .4) * 2; // .5 is a guess... fix in testing
+        float yShift = DeadZone(xbox->GetY(GenericHID::JoystickHand::kLeftHand), .4) * -2;  // same as above
         if (xShift == 0 && yShift == 0) {
             move = false;
+            std::cout << "X: " << x << "\n" << "Y: " << y << "\n";
         } else {
             x += xShift;
             y += yShift;
-            // moveToPosition(x, y);
+            moveToPosition(x, y);
         }
     }
     if (move) {
         turretReset = true;
-        // same loop as the shoulder but using turret values to get it to the exact center
     } else {
         // m_turretMotor->Set(turretReset);
     }
-
-    // these below ar just for testing
-    m_shoulderMotor->Set(DeadZone(xbox->GetY(GenericHID::JoystickHand::kLeftHand), .3) * .3);
-    // cout << m_shoulderPot->Get() << "\n";
-    // m_elbowMotor->Set(DeadZone(xbox->GetY(GenericHID::JoystickHand::kRightHand), .1) * .35);
-
-    m_turretMotor->Set(DeadZone(xbox->GetY(GenericHID::JoystickHand::kLeftHand), .3) * .6);
 
     SetMotors();
 }
@@ -149,23 +154,33 @@ Arm::moveToPosition(float x, float y)
 void
 Arm::SetMotors() {
     // set the position the potentiometer should be at in the PID closed loop of the elbow Talon (second parameter is a voltage 0-3.3 i think)
-    //shoulderAngle = M_PI / 2;
-    elbowAngle = M_PI / 8;
-    //m_elbowMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, (elbowAngle * -0.543281 + 2.22394)); // <- black robot stuff
-    m_elbowMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, (300)); // <- red robot stuff=
-    double position = elbowAngle * -0.553446 + 2.38284;
-    SmartDashboard::PutNumber("Elbow Motor Position:", position);
+    // shoulderAngle = M_PI / 2;
+    // elbowAngle = M_PI / 2;
+    // moveToPosition(609.6, 914.4);
+    // m_elbowMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, (elbowAngle * -0.543281 + 2.22394)); // <- black robot stuff
+    // Offset -20
+    if(-169.284 * elbowAngle + 655.854 < 200) {
+        std::cout << -169.284 * elbowAngle + 655.854 << "\n";
+    }
+    else if(-169.284 * elbowAngle + 655.854 > 600) {
+        std::cout << -169.284 * elbowAngle + 655.854 << "\n";
+    }
+    else {
+    m_elbowMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, (-169.284 * elbowAngle + 655.854)); // <- red robot stuff
+    }
     
+    // Black robot equation: shoulderAngle * 0.163044 + 0.142698
+    // Red shoulder equation is off
     // set the shoulder speed
-    /*if (abs(m_shoulderPot->Get() - (shoulderAngle * 0.163044 + 0.142698)) > .01) { // .1 is a placeholder for how close the motor can get at full power
-        if (m_shoulderPot->Get() > (shoulderAngle * 0.163044 + 0.142698)) {
+   if (abs(m_shoulderPot->Get() - (shoulderAngle * 0.0837496 + 0.393355)) > .01) { // .1 is a placeholder for how close the motor can get at full power
+        if (m_shoulderPot->Get() > (shoulderAngle * 0.0837496 + 0.393355)) {
             m_shoulderMotor->Set(-1); // too fast?
         } else {
             m_shoulderMotor->Set(1); // same
         }
     } else {
-        if (abs(m_shoulderPot->Get() - (shoulderAngle * 0.163044 + 0.142698)) > .001) { // .01 is a placeholder for how close to let the motor get without any extra adjustment
-            if (m_shoulderPot->Get() > (shoulderAngle * 0.163044 + 0.142698)) {
+        if (abs(m_shoulderPot->Get() - (shoulderAngle * 0.0837496 + 0.393355)) > .001) { // .01 is a placeholder for how close to let the motor get without any extra adjustment
+            if (m_shoulderPot->Get() > (shoulderAngle * 0.0837496 + 0.393355)) {
                 m_shoulderMotor->Set(-.1); // this is a guess
             } else {
                 m_shoulderMotor->Set(.1); // also a guess
@@ -173,7 +188,7 @@ Arm::SetMotors() {
         } else {
             m_shoulderMotor->Set(0);
         }
-    }*/
+    }
 }
 
 // this function takes in the x distance from the target (starting from the edge of the drive train), and the y from the ground
