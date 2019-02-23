@@ -29,6 +29,9 @@ Arm::ArmInit()
     // needed to configure the talon to make sure things are ready for position mode
     m_elbowMotor->ConfigSelectedFeedbackSensor(FeedbackDevice::Analog, 0, 0);
     m_elbowMotor->SetSensorPhase(false);
+    m_elbowMotor->ConfigFeedbackNotContinuous(true);
+    m_elbowMotor->ConfigAllowableClosedloopError(0, 10, 0);
+    m_elbowMotor->Config_IntegralZone(0, 20.0, 0);
     m_elbowMotor->Config_kF(0, 0.0, 0);
 	m_elbowMotor->Config_kP(0, 3.2, 0);
 	m_elbowMotor->Config_kI(0, 0.0, 0);
