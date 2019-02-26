@@ -83,8 +83,9 @@ void Arm::Tick(XboxController *xbox, POVButton *dPad[])
             x = cargoBallLength;
             y = cargoBallHeight;
         } else if (dPad[L]->Get()) {
-            x = defaultX;
-            y = cargoHatchHeight;
+            // Place hatch at cargo ship
+            x = 356.394;
+            y = 150;
         } else if (dPad[B]->Get()) {
             x = defaultX;
             y = rocketBallLowHeight;
@@ -134,7 +135,8 @@ void Arm::Tick(XboxController *xbox, POVButton *dPad[])
         }
     }
     if (move) {
-        turretReset = true;
+        // turretReset = true;
+        moveToPosition(x, y);
     } else {
         m_turretMotor->Set(turretMove);
     }
@@ -236,11 +238,11 @@ Arm::FindArmAngles(float x, float y, float *ang1, float *ang2)
 
     //TBD: must make the x value vary based on where the turret is.
     // for now i assume it is facing forward
-	y -= armBaseHeight;
-    x += armBaseFrontX - clawLength;
-    r = sqrt(x*x+y*y);
+	r = sqrt(x*x+y*y);
 	*ang2 = acos((highArmLength * highArmLength + lowArmLength * lowArmLength - r * r) / (2 * highArmLength * lowArmLength));
 	*ang1 = acos((lowArmLength * lowArmLength + r * r - highArmLength * highArmLength) / (2 * lowArmLength * r)) + atan(y / x);
+    y -= armBaseHeight;
+    x += armBaseFrontX - clawLength;
     // HERE must find out whether or not the angles are allowed on the robot and return true or false accordingly
     return (*ang1 > 0 && *ang2 > 0);
 }

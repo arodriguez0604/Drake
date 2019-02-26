@@ -42,7 +42,6 @@ using namespace std;
 #define ballPickUpY               165 //guess
 #define discLoadHeight            381//          10      not used for controls
 #define ballLoadHeight            0 //unknown    11      WRITE THIS ONE
-
 enum POVButtons {R, T, L, B};
 
 using namespace frc;
