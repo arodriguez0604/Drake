@@ -3,6 +3,7 @@
 // claw servo position must be public or have a public get function
 
 #include <iostream>
+#define _USE_MATH_DEFINES
 #include <Math.h>
 #include <rev/CANSparkMax.h>
 #include <ctre/Phoenix.h>

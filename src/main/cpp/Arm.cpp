@@ -29,17 +29,25 @@ Arm::ArmInit()
     // needed to configure the talon to make sure things are ready for position mode
     m_elbowMotor->ConfigSelectedFeedbackSensor(FeedbackDevice::Analog, 0, 0);
     m_elbowMotor->SetSensorPhase(false);
+    m_elbowMotor->ConfigFeedbackNotContinuous(true);
+    m_elbowMotor->ConfigAllowableClosedloopError(0, 10, 0);  // maybe change this number
+    m_elbowMotor->Config_IntegralZone(0, 20.0, 0);
     m_elbowMotor->Config_kF(0, 0.0, 0);
-	m_elbowMotor->Config_kP(0, 3.2, 0);
+	m_elbowMotor->Config_kP(0, 7.0, 0);
 	m_elbowMotor->Config_kI(0, 0.0, 0);
-    m_elbowMotor->Config_kD(0, 1.0, 0);
+    m_elbowMotor->Config_kD(0, 2.5, 0);
+    turretReset = true;
 }
 float
 Arm::DeadZone(float input, float range) {
     if (abs(input) < range) {
         return 0;
     } else {
-        return input;
+        if (input > 0) {
+            return (input - range) / (1 - range);
+        } else {
+            return -1 * (abs(input) - range) / (1 - range);
+        }
     }
 }
 
@@ -112,17 +120,9 @@ void Arm::Tick(XboxController *xbox, POVButton *dPad[])
     }
     if (move) {
         turretReset = true;
-        // same loop as the shoulder but using turret values to get it to the exact center
     } else {
-        // m_turretMotor->Set(turretReset);
+        // m_turretMotor->Set(turretMove);
     }
-
-    // these below ar just for testing
-    m_shoulderMotor->Set(DeadZone(xbox->GetY(GenericHID::JoystickHand::kLeftHand), .3) * .3);
-    // cout << m_shoulderPot->Get() << "\n";
-    // m_elbowMotor->Set(DeadZone(xbox->GetY(GenericHID::JoystickHand::kRightHand), .1) * .35);
-
-    m_turretMotor->Set(DeadZone(xbox->GetY(GenericHID::JoystickHand::kLeftHand), .3) * .6);
 
     SetMotors();
 }
@@ -146,12 +146,10 @@ Arm::moveToPosition(float x, float y)
 void
 Arm::SetMotors() {
     // set the position the potentiometer should be at in the PID closed loop of the elbow Talon (second parameter is a voltage 0-3.3 i think)
-    //shoulderAngle = M_PI / 2;
-    elbowAngle = M_PI / 8;
-    //m_elbowMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, (elbowAngle * -0.543281 + 2.22394)); // <- black robot stuff
-    m_elbowMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, (300)); // <- red robot stuff=
-    double position = elbowAngle * -0.553446 + 2.38284;
-    SmartDashboard::PutNumber("Elbow Motor Position:", position);
+    // shoulderAngle = M_PI / 2;
+    elbowAngle = M_PI / 2;
+    // m_elbowMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, (elbowAngle * -0.543281 + 2.22394)); // <- black robot stuff
+    m_elbowMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, (169.284 * elbowAngle + 124.033)); // <- red robot stuff
     
     // set the shoulder speed
     /*if (abs(m_shoulderPot->Get() - (shoulderAngle * 0.163044 + 0.142698)) > .01) { // .1 is a placeholder for how close the motor can get at full power
@@ -171,6 +169,9 @@ Arm::SetMotors() {
             m_shoulderMotor->Set(0);
         }
     }*/
+    if (turretReset) {
+        // HERE add the same loop as above but for the turret set at a specific angle straight forward
+    }
 }
 
 // this function takes in the x distance from the target (starting from the edge of the drive train), and the y from the ground
