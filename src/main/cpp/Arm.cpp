@@ -164,6 +164,7 @@ Arm::computeElbowPosition(double angle)
 {
 #ifdef RED_BOT
     return -169.284 * angle + 655.854;
+    // Old numbers: -169.284 * angle + 655.854
 #else
     // need BLACK_BOT numbers...for now if defined using red
     return -169.284 * angle + 655.854;
