@@ -20,14 +20,14 @@ using namespace rev;
 using namespace std;
 
 // in millimeters (check these)
-#define armBaseHeight             343
-#define armBaseFrontX             445
-#define armBaseSideX              358
+#define armBaseHeight             342.9
+#define armBaseFrontX             387.35
+#define armBaseSideX              342.9
 #define clawLength                165
-#define maxLowArmAngle            150
-#define minLowArmAngle            70
-#define lowArmLength              813
-#define highArmLength             1092
+//#define maxLowArmAngle            150
+//#define minLowArmAngle            70
+#define lowArmLength              838.2
+#define highArmLength             1079.5
 #define defaultX                  470                    // i made this up
 #define cargoHatchHeight          381          // 1
 #define cargoBallHeight           1219         // 2
