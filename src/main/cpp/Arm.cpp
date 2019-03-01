@@ -88,14 +88,14 @@ void Arm::Tick(XboxController *xbox, POVButton *dPad[])
             y = rocketHatchLowHeight;
         } else if (dPad[T]->Get()) {
             x = cargoBallLength;
-            y = cargoBallHeight;
+            y = cargoBallHeight; 
         } else if (dPad[L]->Get()) {
             // Place hatch at cargo ship
-            x = 356.394;
-            y = 150;
+            x = 509.737;
+            y = -140.286;
         } else if (dPad[B]->Get()) {
             x = defaultX;
-            y = rocketBallLowHeight;
+            y = rocketBallLowHeight;  
         } else {
             move = false;
         }
@@ -130,7 +130,7 @@ void Arm::Tick(XboxController *xbox, POVButton *dPad[])
     } else if (xbox->GetTriggerAxis(GenericHID::JoystickHand::kRightHand) > .1) {
         // FETAL POSITION
     } else {
-        float xShift = DeadZone(xbox->GetY(GenericHID::JoystickHand::kRightHand), .4) * 2; // .5 is a guess... fix in testing
+        float xShift = DeadZone(xbox->GetY(GenericHID::JoystickHand::kRightHand), .4) * -2; // .5 is a guess... fix in testing
         float yShift = DeadZone(xbox->GetY(GenericHID::JoystickHand::kLeftHand), .4) * -2;  // same as above
         if (xShift == 0 && yShift == 0) {
             move = false;
@@ -171,6 +171,7 @@ Arm::computeElbowPosition(double angle)
 {
 #ifdef RED_BOT
     return -169.284 * angle + 655.854;
+    // Old numbers: -169.284 * angle + 655.854
 #else
     // need BLACK_BOT numbers...for now if defined using red
     return -169.284 * angle + 655.854;
@@ -181,7 +182,7 @@ bool
 Arm::validElbowPosition(double pos)
 {
 #ifdef RED_BOT
-    if((pos < 200.0) || (pos > 600.0)) {
+    if((pos < 100.0) || (pos > 700.0)) { // Original values were 200 and 600
         std::cout << "Elbow position out of range: " << pos << "\n";
         return false;
     }
@@ -196,7 +197,8 @@ double
 Arm::computeShoulderPosition(double angle)
 {
 #ifdef RED_BOT
-    return angle * 0.0837496 + 0.393355;
+    return 0.166743 * angle + 0.251658;
+// Old numbers: angle * 0.0837496 + 0.393355
 #else // BLACK_BOT
     return angle * 0.163044 + 0.142698;
 #endif
@@ -245,11 +247,13 @@ Arm::FindArmAngles(float x, float y, float *ang1, float *ang2)
 
     //TBD: must make the x value vary based on where the turret is.
     // for now i assume it is facing forward
-	r = sqrt(x*x+y*y);
+
+    //get y and x before r
+	y -= armBaseHeight;
+    x += armBaseFrontX;
+    r = sqrt(x*x+y*y);
 	*ang2 = acos((highArmLength * highArmLength + lowArmLength * lowArmLength - r * r) / (2 * highArmLength * lowArmLength));
 	*ang1 = acos((lowArmLength * lowArmLength + r * r - highArmLength * highArmLength) / (2 * lowArmLength * r)) + atan(y / x);
-    y -= armBaseHeight;
-    x += armBaseFrontX - clawLength;
     // HERE must find out whether or not the angles are allowed on the robot and return true or false accordingly
     return (*ang1 > 0 && *ang2 > 0);
 }
