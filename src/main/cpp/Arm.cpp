@@ -9,7 +9,7 @@ Arm::Arm(int shoulderMotor, int elbowMotor, int turretMotor, int shoulderPot)
     m_elbowMotor           = new WPI_TalonSRX(elbowMotor);
     m_turretMotor          = new WPI_TalonSRX(turretMotor);
     m_shoulderPot          = new AnalogPotentiometer(shoulderPot, 1.0, 0.0);
-    m_shoulderController   = new PIDController(3.2, 0.0, 0.0, m_shoulderPot, m_shoulderMotor);
+    m_shoulderController   = new PIDController(0.0, 0.0, 0.0, m_shoulderPot, m_shoulderMotor);
     m_shoulderMotorEncoder = new CANEncoder(*m_shoulderMotor);
     ArmInit();
 }
@@ -21,7 +21,7 @@ Arm::Arm(CANSparkMax *shoulderMotor, WPI_TalonSRX *elbowMotor, WPI_TalonSRX *tur
     m_turretMotor          = turretMotor;
     m_shoulderPot          = shoulderPot;
     m_shoulderMotorEncoder = new CANEncoder(*m_shoulderMotor);
-    m_shoulderController   = new PIDController(3.2, 0.0, 0.0, m_shoulderPot, m_shoulderMotor);
+    m_shoulderController   = new PIDController(0.0, 0.0, 0.0, m_shoulderPot, m_shoulderMotor);
     ArmInit();
 }
 
@@ -29,19 +29,26 @@ void
 Arm::ArmInit()
 {
     // needed to configure the talon to make sure things are ready for position mode
+    m_elbowMotor->SetNeutralMode(NeutralMode::Brake);
     m_elbowMotor->ConfigSelectedFeedbackSensor(FeedbackDevice::Analog, 0, 0);
     m_elbowMotor->SetSensorPhase(false); // Need to test this value for black bot
     m_elbowMotor->ConfigFeedbackNotContinuous(true);
     m_elbowMotor->ConfigAllowableClosedloopError(0, 0, 0);
-    m_elbowMotor->Config_IntegralZone(0, 20.0, 0);
+    m_elbowMotor->Config_IntegralZone(0, 0, 0);
     m_elbowMotor->Config_kF(0, 0.0, 0);
-	m_elbowMotor->Config_kP(0, 7.2, 0);
-	m_elbowMotor->Config_kI(0, 0.0, 0);
-    m_elbowMotor->Config_kD(0, 2.0, 0);
+	m_elbowMotor->Config_kP(0, 5.0, 0);
+	m_elbowMotor->Config_kI(0, 0.001, 0);
+    m_elbowMotor->Config_kD(0, 4.0, 0);
+    m_elbowMotor->ConfigClosedloopRamp(0.75);
 
     // shoulder motor PID control
+    m_shoulderController->SetPID(7.0, 0.0, 0.0);
     m_shoulderController->SetContinuous(false);
     m_shoulderController->Reset();
+
+ 	m_shoulderMotor->SetIdleMode(CANSparkMax::IdleMode::kBrake);
+    m_shoulderMotor->SetSmartCurrentLimit(60, 2, 0);
+	m_shoulderMotor->SetOpenLoopRampRate(0.5);
 
     //find the location soon and set it
     curX = 609.6; // This is temporary
@@ -127,7 +134,7 @@ void Arm::Tick(XboxController *xbox, POVButton *dPad[])
         float yShift = DeadZone(xbox->GetY(GenericHID::JoystickHand::kLeftHand), .4) * -2;  // same as above
         if (xShift == 0 && yShift == 0) {
             move = false;
-            std::cout << "X: " << x << "\n" << "Y: " << y << "\n";
+            // std::cout << "X: " << x << "\n" << "Y: " << y << "\n";
         } else {
             x += xShift;
             y += yShift;
@@ -153,7 +160,7 @@ Arm::moveToPosition(float x, float y)
         elbowAngle = ang2;
         curX = x;
         curY = y;
-        std::cout << "MOVING TO: x = " << x << ", y = " << y << ", ang1 = " << ang1 << ", ang2 = " << ang2 << "\n";
+        // std::cout << "MOVING TO: x = " << x << ", y = " << y << ", ang1 = " << ang1 << ", ang2 = " << ang2 << "\n";
     } else {
         std::cout << "INVALID ANGLE: x = " << x << ", y = " << y << ", ang1 = " << ang1 << ", ang2 = " << ang2 << "\n";
     }

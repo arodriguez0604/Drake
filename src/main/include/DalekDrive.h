@@ -32,30 +32,25 @@ class DalekDrive {
 
 	~DalekDrive();
 
-	void TankDrive(frc::GenericHID* leftStick, frc::GenericHID* rightStick,
+	void TankDrive(frc::Joystick* leftStick, frc::Joystick* rightStick,
             bool squaredInputs = true);
-	void TankDrive(frc::GenericHID& leftStick, frc::GenericHID& rightStick,
+	void TankDrive(frc::Joystick& leftStick, frc::Joystick& rightStick,
             bool squaredInputs = true);
 	void TankDrive(double leftValue, double rightValue,
             bool squaredInputs = true);
 
-	void ArcadeDrive(frc::GenericHID* stick, bool squaredInputs = true);
-	void ArcadeDrive(frc::GenericHID& stick, bool squaredInputs = true);
+	void ArcadeDrive(frc::Joystick* stick, bool squaredInputs = true);
+	void ArcadeDrive(frc::Joystick& stick, bool squaredInputs = true);
 	void ArcadeDrive(double moveValue, double rotateValue,
             bool squaredInputs = true);
 
-	void Polar(frc::GenericHID* leftStick, frc::GenericHID* rightStick);
-	void Polar(frc::GenericHID& leftStick, frc::GenericHID& rightStick);
+	void Polar(frc::Joystick* stick);
+	void Polar(frc::Joystick& stick);
 	void Polar(double magnitude, double angle, double zRotation);
 
-	void Cartesian(frc::GenericHID* leftStick, frc::GenericHID* rightStick, 
-			double gyroAngle = 0.0);
-	void Cartesian(frc::GenericHID& leftStick, frc::GenericHID& rightStick, 
-			double gyroAngle = 0.0);
-	void Cartesian(double ySpeed, double xSpeed, double zRotation,
-			double gyroAngle = 0.0);
-	void Cartesian(frc::Joystick& Stick,
-			double gyroAngle = 0.0);
+	void Cartesian(frc::Joystick* stick, double gyroAngle = 0.0);
+	void Cartesian(frc::Joystick& stick, double gyroAngle = 0.0);
+	void Cartesian(double ySpeed, double xSpeed, double zRotation, double gyroAngle = 0.0);
 
 	void SetLeftRightMotorOutputs(double leftOutput, double rightOutput);
 	void SetInvertedMotor(int side, bool isInverted);

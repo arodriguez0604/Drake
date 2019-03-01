@@ -13,6 +13,7 @@
 #include <frc/WPILib.h>
 #include <rev/CANSparkMax.h>
 #include <ctre/Phoenix.h>
+#include <AHRS.h>
 #include "frc/smartdashboard/SmartDashboard.h"
 #include "DalekDrive.h"
 #include "MicroLidar.h"
@@ -53,4 +54,5 @@ class Robot : public frc::TimedRobot {
   frc::Joystick *m_rightStick;
   frc::XboxController *m_xbox;
   frc::POVButton *m_dPad[4];
+  AHRS *ahrs;
 };

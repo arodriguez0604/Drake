@@ -97,8 +97,9 @@ DalekDrive::squareInput(double v)
 		return -(v * v);
 	return (v * v);
 }
+
 void
-DalekDrive::TankDrive(GenericHID* leftStick, GenericHID* rightStick,
+DalekDrive::TankDrive(frc::Joystick* leftStick, frc::Joystick* rightStick,
              bool squaredInputs)
 {
 	if(m_type == DalekDrive::driveType::kDifferential)
@@ -119,7 +120,7 @@ DalekDrive::TankDrive(GenericHID* leftStick, GenericHID* rightStick,
 }
 
 void
-DalekDrive::TankDrive(GenericHID& leftStick, GenericHID& rightStick,
+DalekDrive::TankDrive(frc::Joystick& leftStick, frc::Joystick& rightStick,
              bool squaredInputs)
 {
 	if(m_type == DalekDrive::driveType::kDifferential)
@@ -138,8 +139,7 @@ DalekDrive::TankDrive(GenericHID& leftStick, GenericHID& rightStick,
 }
 
 void
-DalekDrive::TankDrive(double leftValue, double rightValue,
-             bool squaredInputs)
+DalekDrive::TankDrive(double leftValue, double rightValue, bool squaredInputs)
 {
 	if(m_type == DalekDrive::driveType::kDifferential)
 		m_diffdrive->TankDrive(leftValue, rightValue, squaredInputs);
@@ -157,22 +157,21 @@ DalekDrive::TankDrive(double leftValue, double rightValue,
 }
 
 void
-DalekDrive::ArcadeDrive(GenericHID* stick, bool squaredInputs)
+DalekDrive::ArcadeDrive(frc::Joystick* stick, bool squaredInputs)
 {
 	if(m_type == DalekDrive::driveType::kDifferential)
 		m_diffdrive->ArcadeDrive(stick->GetX(), stick->GetY(), squaredInputs);
 }
 
 void
-DalekDrive::ArcadeDrive(GenericHID& stick, bool squaredInputs)
+DalekDrive::ArcadeDrive(frc::Joystick& stick, bool squaredInputs)
 {
 	if(m_type == DalekDrive::driveType::kDifferential)
 		m_diffdrive->ArcadeDrive(stick.GetX(), stick.GetY(), squaredInputs);
 }
 
 void
-DalekDrive::ArcadeDrive(double moveValue, double rotateValue,
-               bool squaredInputs)
+DalekDrive::ArcadeDrive(double moveValue, double rotateValue, bool squaredInputs)
 {
 	if(m_type == DalekDrive::driveType::kDifferential)
 		m_diffdrive->ArcadeDrive(moveValue, rotateValue, squaredInputs);
@@ -186,18 +185,18 @@ DalekDrive::SetLeftRightMotorOutputs(double leftOutput, double rightOutput)
 }
 
 void 
-DalekDrive::Polar(frc::GenericHID* leftStick, frc::GenericHID* rightStick)
+DalekDrive::Polar(frc::Joystick* stick)
 {
 	if(m_type == DalekDrive::driveType::kMecanum) {
-		m_mecanum->DrivePolar(rightStick->GetY(), rightStick->GetX(), leftStick->GetY());
+		m_mecanum->DrivePolar(stick->GetY(), stick->GetX(), stick->GetTwist());
 	}
 }
 
 void
-DalekDrive::Polar(frc::GenericHID& leftStick, frc::GenericHID& rightStick)
+DalekDrive::Polar(frc::Joystick& stick)
 {
 	if(m_type == DalekDrive::driveType::kMecanum) {
-		m_mecanum->DrivePolar(leftStick.GetY(), rightStick.GetY(), rightStick.GetX());
+		m_mecanum->DrivePolar(stick.GetY(), stick.GetX(), stick.GetTwist());
 	}
 }
 	
@@ -210,39 +209,35 @@ DalekDrive::Polar(double magnitude, double angle, double zRotation)
 }
 
 void
-DalekDrive::Cartesian(frc::GenericHID* leftStick, frc::GenericHID* rightStick, 
-			double gyroAngle)
+DalekDrive::Cartesian(frc::Joystick* stick,	double gyroAngle)
 {
 	if(m_type == DalekDrive::driveType::kMecanum) {
-		m_mecanum->DriveCartesian(rightStick->GetX(), rightStick->GetY(), leftStick->GetY(),
-			gyroAngle);
+		double x, y, z;
+		x = stick->GetX(); x = squareInput(x);
+		y = stick->GetY(); y = squareInput(y);
+		z = stick->GetTwist(); z = squareInput(z);
+		m_mecanum->DriveCartesian(x, y, z, gyroAngle);
 	}
 }
 
 void 
-DalekDrive::Cartesian(frc::GenericHID& leftStick, frc::GenericHID& rightStick, 
-			double gyroAngle)
+DalekDrive::Cartesian(frc::Joystick& stick, double gyroAngle)
 {
+	// for now I'm leaving this the way that was done.  If you want to continue
+	// to have the Cartesian have so much dead space and non linearity, change the
+	// above function to use the same calculations.  Note: This method isn't 
+	// currently used
 	if(m_type == DalekDrive::driveType::kMecanum) {
-		m_mecanum->DriveCartesian(rightStick.GetX(), rightStick.GetY(), leftStick.GetY(),
+		m_mecanum->DriveCartesian(DeadZone(stick.GetX(), .3) * .5, DeadZone(stick.GetY(), .3) * -.5, DeadZone(stick.GetTwist(), .3) * .2,
 			gyroAngle);
 	}
 }
-	
+
 void 
 DalekDrive::Cartesian(double ySpeed, double xSpeed, double zRotation, double gyroAngle)
 {
 	if(m_type == DalekDrive::driveType::kMecanum) {
 		m_mecanum->DriveCartesian(ySpeed, xSpeed, zRotation, gyroAngle);
-	}
-}
-
-void 
-DalekDrive::Cartesian(frc::Joystick& Stick, double gyroAngle)
-{
-	if(m_type == DalekDrive::driveType::kMecanum) {
-		m_mecanum->DriveCartesian(DeadZone(Stick.GetX(), .3) * .5, DeadZone(Stick.GetY(), .3) * -.5, DeadZone(Stick.GetTwist(), .3) * .2,
-			gyroAngle);
 	}
 }
 	

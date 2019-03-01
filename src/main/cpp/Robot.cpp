@@ -43,6 +43,8 @@ Robot::RobotInit()
 #endif
     lineSensor = new LineSensor();
     dalekShuffleboard = new DalekShuffleboard(microLidar, lineSensor);
+    ahrs = new AHRS(SPI::Port::kMXP);
+    
     // CameraServer::GetInstance()->StartAutomaticCapture();
 }
 
@@ -58,32 +60,43 @@ Robot::RobotPeriodic()
 void
 Robot::AutonomousInit() 
 {
+     ahrs->ZeroYaw();
 }
 
 void
 Robot::AutonomousPeriodic()
 {
+    static int step = 0;
+    if(step == 0) {
+        
+    }
 }
 
 void
 Robot::TeleopInit() 
 {
+    // How were are facing in now 0
+    ahrs->ZeroYaw();
 }
 
 void
 Robot::TeleopPeriodic()
 {
+    bool calibrated = !(ahrs->IsCalibrating());
+    SmartDashboard::PutBoolean("NAV-X calibrated", calibrated);
+
     // pick one to test, all should in principle work for the mecanum wheels
     // m_drive->TankDrive(m_leftStick, m_rightStick, false);
     // m_drive->Polar(m_leftStick, m_rightStick);
     // m_drive->Cartesian(m_leftStick, m_rightStick, 0.0);
     // m_drive->SetLeftRightMotorOutputs(m_leftStick->GetY(), -m_rightStick->GetY());
-
-    m_drive->Cartesian(*m_leftStick, 0.0);
-    m_claw->Tick(m_xbox);
-    m_arm->Tick(m_xbox, m_dPad);
-
-    //Motor Voltage values
+    if(calibrated) {
+        SmartDashboard::PutNumber("Robot Heading", ahrs->GetFusedHeading());
+        m_drive->Cartesian(m_leftStick, 0.0);
+        m_claw->Tick(m_xbox);
+        m_arm->Tick(m_xbox, m_dPad);
+    }    
+    // print subsystems information
     m_arm->printInfo();
     m_claw->printVoltage();
 
