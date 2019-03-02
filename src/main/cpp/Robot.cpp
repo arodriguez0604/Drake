@@ -84,7 +84,7 @@ Robot::TeleopPeriodic()
     m_arm->Tick(m_xbox, m_dPad);
 
     //Motor Voltage values
-    m_arm->printVoltage(m_leftStick);
+    m_arm->printInfo();
     m_claw->printVoltage();
 
     /*bool line = lineSensor->getLineSensor(1);

@@ -7,6 +7,7 @@
 
 #pragma once
 
+#define RED_BOT
 
 #include <string>
 #include <frc/WPILib.h>
@@ -22,7 +23,6 @@
 #include "MicroLidar.h"
 #include "DalekShuffleboard.h"
 #include "LineSensor.h"
-
 
 class Robot : public frc::TimedRobot {
  public:
