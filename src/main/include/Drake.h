@@ -13,6 +13,12 @@
 #include <ctre/Phoenix.h>
 #include "DalekDrive.h"
 
+#define FirstRocketPanel 48.26
+
+enum m_Stick [1, 2]
+
+*m_leftStick = new frc::m_Stick(1);
+
 class Robot : public frc::TimedRobot {
  public:
   void RobotInit() override;
