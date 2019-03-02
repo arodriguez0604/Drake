@@ -215,7 +215,7 @@ DalekDrive::Cartesian(frc::Joystick* stick,	double gyroAngle)
 		double x, y, z;
 		x = stick->GetX(); x = squareInput(DeadZone(x, .1));
 		y = stick->GetY(); y = squareInput(DeadZone(y, .1));
-		z = stick->GetTwist(); z = squareInput(squareInput(DeadZone(z, .1))) / 2;
+		z = stick->GetTwist(); z = squareInput(squareInput(DeadZone(z, .1))) / 5;
 		m_mecanum->DriveCartesian(-x, y, -z, gyroAngle);
 	}
 }
