@@ -10,12 +10,10 @@
  */
 #pragma once
 
-#include <Drake.h>
-
 #define CAN_TIMEOUT 100
 #define STALL_LIMIT 60
 #define FREE_LIMIT  2
-#define RAMP_RATE   1.25
+#define RAMP_RATE   0.5
 #define LEFT        0
 #define RIGHT       1
 #define FRONT       0
@@ -34,28 +32,25 @@ class DalekDrive {
 
 	~DalekDrive();
 
-	void TankDrive(frc::GenericHID* leftStick, frc::GenericHID* rightStick,
+	void TankDrive(frc::Joystick* leftStick, frc::Joystick* rightStick,
             bool squaredInputs = true);
-	void TankDrive(frc::GenericHID& leftStick, frc::GenericHID& rightStick,
+	void TankDrive(frc::Joystick& leftStick, frc::Joystick& rightStick,
             bool squaredInputs = true);
 	void TankDrive(double leftValue, double rightValue,
             bool squaredInputs = true);
 
-	void ArcadeDrive(frc::GenericHID* stick, bool squaredInputs = true);
-	void ArcadeDrive(frc::GenericHID& stick, bool squaredInputs = true);
+	void ArcadeDrive(frc::Joystick* stick, bool squaredInputs = true);
+	void ArcadeDrive(frc::Joystick& stick, bool squaredInputs = true);
 	void ArcadeDrive(double moveValue, double rotateValue,
             bool squaredInputs = true);
 
-	void Polar(frc::GenericHID* leftStick, frc::GenericHID* rightStick);
-	void Polar(frc::GenericHID& leftStick, frc::GenericHID& rightStick);
+	void Polar(frc::Joystick* stick);
+	void Polar(frc::Joystick& stick);
 	void Polar(double magnitude, double angle, double zRotation);
 
-	void Cartesian(frc::GenericHID* leftStick, frc::GenericHID* rightStick, 
-			double gyroAngle = 0.0);
-	void Cartesian(frc::GenericHID& leftStick, frc::GenericHID& rightStick, 
-			double gyroAngle = 0.0);
-	void Cartesian(double ySpeed, double xSpeed, double zRotation,
-			double gyroAngle = 0.0);
+	void Cartesian(frc::Joystick* stick, double gyroAngle = 0.0);
+	void Cartesian(frc::Joystick& stick, double gyroAngle = 0.0);
+	void Cartesian(double ySpeed, double xSpeed, double zRotation, double gyroAngle = 0.0);
 
 	void SetLeftRightMotorOutputs(double leftOutput, double rightOutput);
 	void SetInvertedMotor(int side, bool isInverted);
@@ -65,6 +60,7 @@ class DalekDrive {
 	void InitDalekDrive();
 	double squareInput(double v);
 	void printFaults(int side, int faults);
+	float DeadZone(float input, float range);
 	rev::CANSparkMax *m_leftMotor[NUM_MOTORS_PER_SIDE];
 	rev::CANSparkMax *m_rightMotor[NUM_MOTORS_PER_SIDE];
     frc::SpeedControllerGroup *m_left;

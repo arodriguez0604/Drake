@@ -1,4 +1,5 @@
 #include <Drake.h>
+#include <frc/JoyStick.h>
 
 using namespace frc;
 using namespace rev;
@@ -96,8 +97,9 @@ DalekDrive::squareInput(double v)
 		return -(v * v);
 	return (v * v);
 }
+
 void
-DalekDrive::TankDrive(GenericHID* leftStick, GenericHID* rightStick,
+DalekDrive::TankDrive(frc::Joystick* leftStick, frc::Joystick* rightStick,
              bool squaredInputs)
 {
 	if(m_type == DalekDrive::driveType::kDifferential)
@@ -118,7 +120,7 @@ DalekDrive::TankDrive(GenericHID* leftStick, GenericHID* rightStick,
 }
 
 void
-DalekDrive::TankDrive(GenericHID& leftStick, GenericHID& rightStick,
+DalekDrive::TankDrive(frc::Joystick& leftStick, frc::Joystick& rightStick,
              bool squaredInputs)
 {
 	if(m_type == DalekDrive::driveType::kDifferential)
@@ -137,8 +139,7 @@ DalekDrive::TankDrive(GenericHID& leftStick, GenericHID& rightStick,
 }
 
 void
-DalekDrive::TankDrive(double leftValue, double rightValue,
-             bool squaredInputs)
+DalekDrive::TankDrive(double leftValue, double rightValue, bool squaredInputs)
 {
 	if(m_type == DalekDrive::driveType::kDifferential)
 		m_diffdrive->TankDrive(leftValue, rightValue, squaredInputs);
@@ -156,22 +157,21 @@ DalekDrive::TankDrive(double leftValue, double rightValue,
 }
 
 void
-DalekDrive::ArcadeDrive(GenericHID* stick, bool squaredInputs)
+DalekDrive::ArcadeDrive(frc::Joystick* stick, bool squaredInputs)
 {
 	if(m_type == DalekDrive::driveType::kDifferential)
 		m_diffdrive->ArcadeDrive(stick->GetX(), stick->GetY(), squaredInputs);
 }
 
 void
-DalekDrive::ArcadeDrive(GenericHID& stick, bool squaredInputs)
+DalekDrive::ArcadeDrive(frc::Joystick& stick, bool squaredInputs)
 {
 	if(m_type == DalekDrive::driveType::kDifferential)
 		m_diffdrive->ArcadeDrive(stick.GetX(), stick.GetY(), squaredInputs);
 }
 
 void
-DalekDrive::ArcadeDrive(double moveValue, double rotateValue,
-               bool squaredInputs)
+DalekDrive::ArcadeDrive(double moveValue, double rotateValue, bool squaredInputs)
 {
 	if(m_type == DalekDrive::driveType::kDifferential)
 		m_diffdrive->ArcadeDrive(moveValue, rotateValue, squaredInputs);
@@ -185,18 +185,18 @@ DalekDrive::SetLeftRightMotorOutputs(double leftOutput, double rightOutput)
 }
 
 void 
-DalekDrive::Polar(frc::GenericHID* leftStick, frc::GenericHID* rightStick)
+DalekDrive::Polar(frc::Joystick* stick)
 {
 	if(m_type == DalekDrive::driveType::kMecanum) {
-		m_mecanum->DrivePolar(leftStick->GetY(), rightStick->GetY(), rightStick->GetX());
+		m_mecanum->DrivePolar(stick->GetY(), stick->GetX(), stick->GetTwist());
 	}
 }
 
 void
-DalekDrive::Polar(frc::GenericHID& leftStick, frc::GenericHID& rightStick)
+DalekDrive::Polar(frc::Joystick& stick)
 {
 	if(m_type == DalekDrive::driveType::kMecanum) {
-		m_mecanum->DrivePolar(leftStick.GetY(), rightStick.GetY(), rightStick.GetX());
+		m_mecanum->DrivePolar(stick.GetY(), stick.GetX(), stick.GetTwist());
 	}
 }
 	
@@ -209,25 +209,30 @@ DalekDrive::Polar(double magnitude, double angle, double zRotation)
 }
 
 void
-DalekDrive::Cartesian(frc::GenericHID* leftStick, frc::GenericHID* rightStick, 
-			double gyroAngle)
+DalekDrive::Cartesian(frc::Joystick* stick,	double gyroAngle)
 {
 	if(m_type == DalekDrive::driveType::kMecanum) {
-		m_mecanum->DriveCartesian(leftStick->GetY(), rightStick->GetY(), rightStick->GetX(),
-			gyroAngle);
+		double x, y, z;
+		x = stick->GetX(); x = squareInput(x);
+		y = stick->GetY(); y = squareInput(y);
+		z = stick->GetTwist(); z = squareInput(z);
+		m_mecanum->DriveCartesian(x, y, z, gyroAngle);
 	}
 }
 
 void 
-DalekDrive::Cartesian(frc::GenericHID& leftStick, frc::GenericHID& rightStick, 
-			double gyroAngle)
+DalekDrive::Cartesian(frc::Joystick& stick, double gyroAngle)
 {
+	// for now I'm leaving this the way that was done.  If you want to continue
+	// to have the Cartesian have so much dead space and non linearity, change the
+	// above function to use the same calculations.  Note: This method isn't 
+	// currently used
 	if(m_type == DalekDrive::driveType::kMecanum) {
-		m_mecanum->DriveCartesian(leftStick.GetY(), rightStick.GetY(), rightStick.GetX(),
+		m_mecanum->DriveCartesian(DeadZone(stick.GetX(), .3) * .5, DeadZone(stick.GetY(), .3) * -.5, DeadZone(stick.GetTwist(), .3) * .2,
 			gyroAngle);
 	}
 }
-	
+
 void 
 DalekDrive::Cartesian(double ySpeed, double xSpeed, double zRotation, double gyroAngle)
 {
@@ -235,7 +240,7 @@ DalekDrive::Cartesian(double ySpeed, double xSpeed, double zRotation, double gyr
 		m_mecanum->DriveCartesian(ySpeed, xSpeed, zRotation, gyroAngle);
 	}
 }
-
+	
 void
 DalekDrive::SetInvertedMotor(int side, bool isInverted)
 {
@@ -268,29 +273,38 @@ DalekDrive::InitDalekDrive(void)
     m_leftMotor[FRONT]->SetCANTimeout(CAN_TIMEOUT);
 	m_leftMotor[FRONT]->SetIdleMode(CANSparkMax::IdleMode::kBrake);
     m_leftMotor[FRONT]->SetSmartCurrentLimit(STALL_LIMIT, FREE_LIMIT, 0);
-	m_leftMotor[FRONT]->SetRampRate(RAMP_RATE);
+	m_leftMotor[FRONT]->SetOpenLoopRampRate(RAMP_RATE);                  // used to be SetRampRate... update i guess... check if this is oprn or closed
 	m_leftMotor[FRONT]->SetInverted(false);
 
     m_rightMotor[FRONT]->SetCANTimeout(CAN_TIMEOUT);
 	m_rightMotor[FRONT]->SetIdleMode(CANSparkMax::IdleMode::kBrake);
     m_rightMotor[FRONT]->SetSmartCurrentLimit(STALL_LIMIT, FREE_LIMIT, 0);
-	m_rightMotor[FRONT]->SetRampRate(RAMP_RATE);
+	m_rightMotor[FRONT]->SetOpenLoopRampRate(RAMP_RATE);                // same
 	m_rightMotor[FRONT]->SetInverted(false);
 
     m_leftMotor[REAR]->SetCANTimeout(CAN_TIMEOUT);
   	m_leftMotor[REAR]->SetIdleMode(CANSparkMax::IdleMode::kBrake);
     m_leftMotor[REAR]->SetSmartCurrentLimit(STALL_LIMIT, FREE_LIMIT, 0);
-	m_leftMotor[REAR]->SetRampRate(RAMP_RATE);
+	m_leftMotor[REAR]->SetOpenLoopRampRate(RAMP_RATE);                  // same
 	m_leftMotor[REAR]->SetInverted(false);
 
     m_rightMotor[REAR]->SetCANTimeout(CAN_TIMEOUT);
 	m_rightMotor[REAR]->SetIdleMode(CANSparkMax::IdleMode::kBrake);
     m_rightMotor[REAR]->SetSmartCurrentLimit(STALL_LIMIT, FREE_LIMIT, 0);
-	m_rightMotor[REAR]->SetRampRate(RAMP_RATE);
+	m_rightMotor[REAR]->SetOpenLoopRampRate(RAMP_RATE);                 // same
 	m_rightMotor[REAR]->SetInverted(false);
 
     m_leftMotor[FRONT]->StopMotor();  m_leftMotor[REAR]->StopMotor();
     m_rightMotor[FRONT]->StopMotor(); m_rightMotor[REAR]->StopMotor();
+}
+
+float
+DalekDrive::DeadZone(float input, float range) {
+    if (abs(input) < range) {
+        return 0;
+    } else {
+        return input;
+    }
 }
 
 void
