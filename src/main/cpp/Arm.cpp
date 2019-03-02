@@ -9,7 +9,7 @@ Arm::Arm(int shoulderMotor, int elbowMotor, int turretMotor, int shoulderPot)
     m_elbowMotor           = new WPI_TalonSRX(elbowMotor);
     m_turretMotor          = new WPI_TalonSRX(turretMotor);
     m_shoulderPot          = new AnalogPotentiometer(shoulderPot, 1.0, 0.0);
-    m_shoulderController   = new PIDController(3.2, 0.0, 0.0, m_shoulderPot, m_shoulderMotor);
+    m_shoulderController   = new PIDController(0.0, 0.0, 0.0, m_shoulderPot, m_shoulderMotor);
     m_shoulderMotorEncoder = new CANEncoder(*m_shoulderMotor);
     ArmInit();
 }
@@ -21,7 +21,7 @@ Arm::Arm(CANSparkMax *shoulderMotor, WPI_TalonSRX *elbowMotor, WPI_TalonSRX *tur
     m_turretMotor          = turretMotor;
     m_shoulderPot          = shoulderPot;
     m_shoulderMotorEncoder = new CANEncoder(*m_shoulderMotor);
-    m_shoulderController   = new PIDController(3.2, 0.0, 0.0, m_shoulderPot, m_shoulderMotor);
+    m_shoulderController   = new PIDController(0.0, 0.0, 0.0, m_shoulderPot, m_shoulderMotor);
     ArmInit();
 }
 
@@ -29,21 +29,32 @@ void
 Arm::ArmInit()
 {
     // needed to configure the talon to make sure things are ready for position mode
+    m_elbowMotor->SetNeutralMode(NeutralMode::Brake);
     m_elbowMotor->ConfigSelectedFeedbackSensor(FeedbackDevice::Analog, 0, 0);
     m_elbowMotor->SetSensorPhase(false); // Need to test this value for black bot
     m_elbowMotor->ConfigFeedbackNotContinuous(true);
     m_elbowMotor->ConfigAllowableClosedloopError(0, 0, 0);
-    m_elbowMotor->Config_IntegralZone(0, 20.0, 0);
+    m_elbowMotor->Config_IntegralZone(0, 0, 0);
     m_elbowMotor->Config_kF(0, 0.0, 0);
-	m_elbowMotor->Config_kP(0, 7.2, 0);
-	m_elbowMotor->Config_kI(0, 0.0, 0);
-    m_elbowMotor->Config_kD(0, 2.0, 0);
+	m_elbowMotor->Config_kP(0, 5.0, 0);
+	m_elbowMotor->Config_kI(0, 0.001, 0);
+    m_elbowMotor->Config_kD(0, 4.0, 0);
+    m_elbowMotor->ConfigClosedloopRamp(0.75);
 
     // shoulder motor PID control
+    m_shoulderController->SetPID(7.0, 0.0, 0.0);
     m_shoulderController->SetContinuous(false);
     m_shoulderController->Reset();
 
-    fetalPosition = true; // once we find where this is we need to set curX and curY and moveToPosition accordingly
+ 	m_shoulderMotor->SetIdleMode(CANSparkMax::IdleMode::kBrake);
+    m_shoulderMotor->SetSmartCurrentLimit(60, 2, 0);
+	m_shoulderMotor->SetOpenLoopRampRate(0.5);
+
+    //find the location soon and set it
+    curX = 609.6; // This is temporary
+    curY = 914.4; // Same
+    moveToPosition(curX, curY);
+    // fetalPosition = true;
 }
 
 float
@@ -53,7 +64,7 @@ Arm::DeadZone(float input, float range)
         return 0;
     } else {
         if (input > 0) {
-            return (input - range) / (1 - range);
+            return (abs(input) - range) / (1 - range);
         } else {
             return -1 * (abs(input) - range) / (1 - range);
         }
@@ -62,32 +73,35 @@ Arm::DeadZone(float input, float range)
 
 void
 Arm::Tick(XboxController *xbox, POVButton *dPad[])
-{
+{   
     float turretMove = DeadZone(xbox->GetX(GenericHID::JoystickHand::kRightHand), .3) * .5;
     float x = curX;
     float y = curY;
     bool move = true;
+    m_turretMotor->Set(0);
     if (xbox->GetAButton()) {
         if (dPad[R]->Get()) {
             x = defaultX;
             y = rocketHatchLowHeight;
         } else if (dPad[T]->Get()) {
             x = cargoBallLength;
-            y = cargoBallHeight;
+            y = cargoBallHeight; 
         } else if (dPad[L]->Get()) {
+            // Place hatch at cargo ship
             x = defaultX;
             y = cargoHatchHeight;
         } else if (dPad[B]->Get()) {
-            x = defaultX;
-            y = rocketBallLowHeight;
+            x = defaultX; 
+            y = rocketBallLowHeight;  
         } else {
             move = false;
         }
     } else if (xbox->GetBButton()) {
         if (dPad[R]->Get() || dPad[T]->Get() || dPad[L]->Get() || dPad[B]->Get()) {
             x = defaultX;
-            y = ballLoadHeight;
+            y = ballLoadHeight; 
         } else {
+            //x and y are good for ball pick up
             x = ballPickUpX;
             y = ballPickUpY;
         }
@@ -118,9 +132,8 @@ Arm::Tick(XboxController *xbox, POVButton *dPad[])
         turretPosition = TURRET_CENTER;
     } else {
         move = false;
-        m_elbowMotor->Set(DeadZone(xbox->GetY(GenericHID::JoystickHand::kRightHand), .4) * .6); // maybe change 6
-        m_shoulderMotor->Set(DeadZone(xbox->GetY(GenericHID::JoystickHand::kLeftHand), .4) * -.2);  // same as above
-        std::cout << "X: " << x << "\n" << "Y: " << y << "\n";
+        elbowAngle += (DeadZone(xbox->GetY(GenericHID::JoystickHand::kRightHand), .4) * -.01); // maybe change 6
+        shoulderAngle += (DeadZone(xbox->GetY(GenericHID::JoystickHand::kLeftHand), .4) * .02);  // same as above
     }
     if (move) {
         moveToPosition(x, y);
@@ -138,6 +151,7 @@ Arm::Tick(XboxController *xbox, POVButton *dPad[])
             }
         }
     }
+    cout << "\n\nShoulder Angle: " << shoulderAngle << "\n\nElbow Angle" << elbowAngle << "\n\nCur X: " << curX << "\n\nCur Y: " << curY;
     SetMotors();
 }
 
@@ -160,9 +174,10 @@ double
 Arm::computeElbowPosition(double angle)
 {
 #ifdef RED_BOT
-    return -169.284 * angle + 655.854;
+    return -155.796 * angle + 672.796; // New numbers
+    // Old numbers: -169.284 * angle + 655.854
 #else
-    // need BLACK_BOT numbers...for now if defined using red
+    // need BLACK_BOT numbers...for now if defi-ned using red
     return -169.284 * angle + 655.854;
 #endif
 }
@@ -171,7 +186,7 @@ bool
 Arm::validElbowPosition(double pos)
 {
 #ifdef RED_BOT
-    if((pos < 200.0) || (pos > 600.0)) {
+    if((pos < 100.0) || (pos > 700.0)) { // Original values were 200 and 600
         std::cout << "Elbow position out of range: " << pos << "\n";
         return false;
     }
@@ -186,7 +201,8 @@ double
 Arm::computeShoulderPosition(double angle)
 {
 #ifdef RED_BOT
-    return angle * 0.0837496 + 0.393355;
+    return 0.166743 * angle + 0.251658;
+    // Old numbers: angle * 0.0837496 + 0.393355
 #else // BLACK_BOT
     return angle * 0.163044 + 0.142698;
 #endif
@@ -213,7 +229,7 @@ Arm::SetMotors()
     // to do the PID control loop in software.  Elbow has a fairly large error
     // which varies over the range +/- 20 units.  Shoulder moves slowly to it's
     // position, which may or may not be an issue.
-
+    fetalPosition = false; //tyemp
     if (fetalPosition) {
         // turret PID to center
         //if turret is at ~center
@@ -230,9 +246,9 @@ Arm::SetMotors()
             m_shoulderController->SetEnabled(true);
         }
 
-        if (turretPosition != TURRET_NONE) {
-            m_turretMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, turretPosition);
-        }
+        // if (turretPosition != TURRET_NONE) {
+        //     m_turretMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, turretPosition);
+        // }
     }
 }
 
@@ -246,9 +262,10 @@ Arm::FindArmAngles(float x, float y, float *ang1, float *ang2)
 
     //TBD: must make the x value vary based on where the turret is.
     // for now i assume it is facing forward
-	y -= armBaseHeight;
 
-    x += armBaseFrontX;
+    //get y and x before r
+	y -= armBaseHeight;
+    x += armBaseFrontX - turretOffset;
     r = sqrt(x*x+y*y);
 	*ang2 = acos((highArmLength * highArmLength + lowArmLength * lowArmLength - r * r) / (2 * highArmLength * lowArmLength));
 	*ang1 = acos((lowArmLength * lowArmLength + r * r - highArmLength * highArmLength) / (2 * lowArmLength * r)) + atan(y / x);
