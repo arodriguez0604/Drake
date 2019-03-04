@@ -27,6 +27,7 @@ Robot::RobotInit()
 
     m_arm = new Arm(SHOULDER_MOTOR, ELBOW_MOTOR, TURRET_MOTOR, 0);
     m_claw = new Claw(CLAW_MOTOR, 0);
+    CameraServer::GetInstance()->StartAutomaticCapture();
 
 #if USE_LIDAR
     microLidar = new MicroLidar("/dev/i2c-2", MicroLidar::CONTINUOUS_MEASURE_MODE);

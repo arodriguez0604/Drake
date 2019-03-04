@@ -84,16 +84,19 @@ void Arm::Tick(XboxController *xbox, POVButton *dPad[])
     //set angles in if statments
     if (xbox->GetAButton()) {
         if (dPad[R]->Get()) {
+            // Place hatch low
             x = defaultX;
             y = rocketHatchLowHeight;
         } else if (dPad[T]->Get()) {
+            // Place ball on cargo ship
             x = cargoBallLength;
             y = cargoBallHeight; 
         } else if (dPad[L]->Get()) {
             // Place hatch at cargo ship
             x = 509.737;
-            y = -140.286;
+            y = cargoHatchHeight;
         } else if (dPad[B]->Get()) {
+            // Place ball low
             x = defaultX;
             y = rocketBallLowHeight;  
         } else {
@@ -170,7 +173,7 @@ double
 Arm::computeElbowPosition(double angle)
 {
 #ifdef RED_BOT
-    return -169.284 * angle + 655.854;
+    return -150.796 * angle + 672.796;
     // Old numbers: -169.284 * angle + 655.854
 #else
     // need BLACK_BOT numbers...for now if defined using red

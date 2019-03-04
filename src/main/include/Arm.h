@@ -29,10 +29,10 @@ using namespace std;
 #define lowArmLength              838.2
 #define highArmLength             1079.5
 #define defaultX                  470                    // i made this up
-#define cargoHatchHeight          381          // 1
-#define cargoBallHeight           1219         // 2
-#define cargoBallLength           750                    // i made this up
-#define rocketHatchLowHeight      495  // check   3
+#define cargoHatchHeight          -140.286
+#define cargoBallHeight           630.095         // 2
+#define cargoBallLength           803.275                    // i made this up
+#define rocketHatchLowHeight      -164.486  // check   3
 #define rocketBallLowHeight       683//           4
 #define rocketHatchMiddleHeight   1168//          (5) 1193.8mm
 #define rocketBallMiddleHeight    1422//          6
