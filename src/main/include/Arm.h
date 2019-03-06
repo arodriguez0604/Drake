@@ -23,33 +23,39 @@ using namespace std;
 #define armBaseHeight             342.9
 #define armBaseFrontX             387.35
 #define armBaseSideX              342.9
-#define clawLength                165
-//#define maxLowArmAngle            150
-//#define minLowArmAngle            70
-#define lowArmLength              838.2
+#define lowArmLength              812.8
 #define highArmLength             1079.5
-#define defaultX                  470                    // i made this up
-#define cargoHatchHeight          381          // 1
-#define cargoBallHeight           1219         // 2
-#define cargoBallLength           750                    // i made this up
+#define defaultX                  509.6                    // i made this up
+#define cargoHatchHeight          308          // 1
+#define cargoBallHeight           1003         // 2
+#define cargoBallLength           508                    // i made this up
 #define rocketHatchLowHeight      495  // check   3
-#define rocketBallLowHeight       683//           4
+#define rocketBallLowHeight       679.45 //           4
 #define rocketHatchMiddleHeight   1168//          (5) 1193.8mm
 #define rocketBallMiddleHeight    1422//          6
 #define rocketHatchTopHeight      1867//          7
+
 #define rocketBallTopHeight       2083//          8
-#define ballPickUpX               279 //guess     9
-#define ballPickUpY               165 //guess
-#define discLoadHeight            381//          10      not used for controls
+#define ballPickUpX               279
+#define ballPickUpY               165 
+#define discLoadHeight            260// only if we are hooking it
 #define ballLoadHeight            0 //unknown    11      WRITE THIS ONE
+
+#define TURRET_LEFT               0 // find this 
+#define TURRET_RIGHT              0 // find this 
+#define TURRET_CENTER             0 // find this 
+#define TURRET_NONE               0
+#define turretOffset              30.48
+
 enum POVButtons {R, T, L, B};
+
 
 using namespace frc;
 
 class Arm {
   public:
-    float shoulderAngle, elbowAngle, curX, curY;
-    bool turretReset;
+    float turretPosition, shoulderAngle, elbowAngle, curX, curY;
+    bool fetalPosition;
 
     Arm(int shoulderMotor, int elbowMotor, int turretMotor, int shoulderPot);
     Arm(CANSparkMax *shoulderMotor, WPI_TalonSRX *elbowMotor, 
