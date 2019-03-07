@@ -30,16 +30,18 @@ using namespace std;
 #define cargoBallHeight           1003         // 2 need to increase height
 #define cargoBallLength           508                    // i made this up
 #define rocketHatchLowHeight      298  // check   3
-#define rocketBallLowHeight       679.45 //           4
-#define rocketHatchMiddleHeight   1168//          (5) 1193.8mm
-#define rocketBallMiddleHeight    1422//          6
-#define rocketHatchTopHeight      1867//          7
-
-#define rocketBallTopHeight       2083//          8
-#define ballPickUpX               279
+#define rocketBallLowHeight       679.45 // 4  It WORKS 
+#define rocketHatchMiddleHeight   1047.75 // 5   IT WORKS 
+#define rocketBallMiddleHeight    1422// 6 It WORKS
+#define rocketHatchTopHeight      1740// 7  IT WORKS
+#define rocketBallTopHeight       2096// 8  IT WORKS
+#define ballPickUpX               279 
+#define rocketTopHeightX          76 // IT WORKS
 #define ballPickUpY               165 
 #define discLoadHeight            298// only if we are hooking it
-#define ballLoadHeight            1219 //unknown    11      WRITE THIS ONE
+#define ballLoadHeight            1101 //unknown    11  
+#define ballLoadX                 368    //WRITE THIS ONE
+#define rocketTopHeightBallX      76
 
 #define TURRET_LEFT               0 // find this 
 #define TURRET_RIGHT              0 // find this 

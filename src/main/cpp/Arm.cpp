@@ -103,7 +103,7 @@ Arm::Tick(XboxController *xbox, POVButton *dPad[])
         }
     } else if (xbox->GetBButton()) {
         if (dPad[R]->Get() || dPad[T]->Get() || dPad[L]->Get() || dPad[B]->Get()) {
-            x = defaultX;
+            x = ballLoadX;
             y = ballLoadHeight; 
         } else {
             //x and y are good for ball pick up
@@ -125,7 +125,7 @@ Arm::Tick(XboxController *xbox, POVButton *dPad[])
             x = defaultX;
             y = rocketHatchTopHeight;
         } else if (dPad[B]->Get()) {
-            x = defaultX;
+            x = rocketTopHeightBallX;
             y = rocketBallTopHeight;
         } else {
             move = false;
