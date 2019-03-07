@@ -82,6 +82,9 @@ Robot::TeleopInit()
 void
 Robot::TeleopPeriodic()
 {
+    SmartDashboard::PutBoolean("Dpad[L]", m_dPad[L]->Get());
+
+
     bool calibrated = !(ahrs->IsCalibrating());
     SmartDashboard::PutBoolean("NAV-X calibrated", calibrated);
 

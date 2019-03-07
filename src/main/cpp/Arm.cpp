@@ -50,11 +50,16 @@ Arm::ArmInit()
     m_shoulderMotor->SetSmartCurrentLimit(60, 2, 0);
 	m_shoulderMotor->SetOpenLoopRampRate(0.5);
 
+    m_turretMotor->ConfigSelectedFeedbackSensor(FeedbackDevice::Analog, 0, 0);
+    m_turretMotor->ConfigFeedbackNotContinuous(true);
+    m_turretMotor->ConfigAllowableClosedloopError(0, 0, 0);
+
     //find the location soon and set it
     curX = 609.6; // This is temporary
-    curY = 914.4; // Same
+    curY = 914.4; // Same (36 in)
     moveToPosition(curX, curY);
     // fetalPosition = true;
+    turretPosition = TURRET_NONE; // maybe change this
 }
 
 float
@@ -174,7 +179,8 @@ double
 Arm::computeElbowPosition(double angle)
 {
 #ifdef RED_BOT
-    return -155.796 * angle + 672.796; // New numbers
+    return -173.267 * angle + 681.074;
+    // Less old numbers: -155.796 * angle + 672.796
     // Old numbers: -169.284 * angle + 655.854
 #else
     // need BLACK_BOT numbers...for now if defi-ned using red
@@ -282,12 +288,19 @@ Arm::printInfo()
     SmartDashboard::PutNumber("Elbow current", m_elbowMotor->GetOutputCurrent());
     //min:.125 max:.8
     SmartDashboard::PutNumber("Turret current", m_turretMotor->GetOutputCurrent());
+    SmartDashboard::PutNumber("Turret position", m_turretMotor->GetSelectedSensorPosition(0));
 
     SmartDashboard::PutNumber("Elbow position", m_elbowMotor->GetSelectedSensorPosition(0));
     SmartDashboard::PutNumber("Elbow close loop error", m_elbowMotor->GetClosedLoopError(0));
-
+ 
     SmartDashboard::PutNumber("Shoulder position", m_shoulderPot->Get());
     SmartDashboard::PutNumber("Shoulder close loop error", m_shoulderController->GetError());
+
+    // use equation backwords to find angles after fine movemenbt, then x and y
+    SmartDashboard::PutNumber("Shoulder Angle", shoulderAngle * 180.0 / M_PI);
+    SmartDashboard::PutNumber("Elbow Angle", elbowAngle * 180.0 / M_PI);
+    SmartDashboard::PutNumber("X", curX * .0393701);
+    SmartDashboard::PutNumber("Y", curY * .0393701);
 }
 
 
