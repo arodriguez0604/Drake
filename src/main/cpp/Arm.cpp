@@ -54,7 +54,7 @@ Arm::ArmInit()
     curX = 609.6; // This is temporary
     curY = 914.4; // Same
     moveToPosition(curX, curY);
-    turretReset = true;
+    // fetalPosition = true;
 }
 
 float
@@ -63,25 +63,22 @@ Arm::DeadZone(float input, float range)
     if (abs(input) < range) {
         return 0;
     } else {
-        if(input > 0) {
-            return (input - range) / (1 - range);
-        }
-        else {
-            return -1 * (abs(input) - range) / (1-range);
+        if (input > 0) {
+            return (abs(input) - range) / (1 - range);
+        } else {
+            return -1 * (abs(input) - range) / (1 - range);
         }
     }
 }
 
-void Arm::Tick(XboxController *xbox, POVButton *dPad[])
-{
+void
+Arm::Tick(XboxController *xbox, POVButton *dPad[])
+{   
     float turretMove = DeadZone(xbox->GetX(GenericHID::JoystickHand::kRightHand), .3) * .5;
-    if (turretMove != 0) {
-        turretReset = false;
-    }
     float x = curX;
     float y = curY;
     bool move = true;
-    //set angles in if statments
+    m_turretMotor->Set(0);
     if (xbox->GetAButton()) {
         if (dPad[R]->Get()) {
             // Place hatch low
@@ -98,6 +95,9 @@ void Arm::Tick(XboxController *xbox, POVButton *dPad[])
         } else if (dPad[B]->Get()) {
             // Place ball low
             x = defaultX;
+            y = cargoHatchHeight;
+        } else if (dPad[B]->Get()) {
+            x = defaultX; 
             y = rocketBallLowHeight;  
         } else {
             move = false;
@@ -105,8 +105,9 @@ void Arm::Tick(XboxController *xbox, POVButton *dPad[])
     } else if (xbox->GetBButton()) {
         if (dPad[R]->Get() || dPad[T]->Get() || dPad[L]->Get() || dPad[B]->Get()) {
             x = defaultX;
-            y = ballLoadHeight;
+            y = ballLoadHeight; 
         } else {
+            //x and y are good for ball pick up
             x = ballPickUpX;
             y = ballPickUpY;
         }
@@ -131,26 +132,32 @@ void Arm::Tick(XboxController *xbox, POVButton *dPad[])
             move = false;
         }
     } else if (xbox->GetTriggerAxis(GenericHID::JoystickHand::kRightHand) > .1) {
-        // FETAL POSITION
+        // x =
+        // y =
+        fetalPosition = true;
+        turretPosition = TURRET_CENTER;
     } else {
-        float xShift = DeadZone(xbox->GetY(GenericHID::JoystickHand::kRightHand), .4) * -2; // .5 is a guess... fix in testing
-        float yShift = DeadZone(xbox->GetY(GenericHID::JoystickHand::kLeftHand), .4) * -2;  // same as above
-        if (xShift == 0 && yShift == 0) {
-            move = false;
-            // std::cout << "X: " << x << "\n" << "Y: " << y << "\n";
-        } else {
-            x += xShift;
-            y += yShift;
-            moveToPosition(x, y);
-        }
+        move = false;
+        elbowAngle += (DeadZone(xbox->GetY(GenericHID::JoystickHand::kRightHand), .4) * -.01); // maybe change 6
+        shoulderAngle += (DeadZone(xbox->GetY(GenericHID::JoystickHand::kLeftHand), .4) * .02);  // same as above
     }
     if (move) {
-        // turretReset = true;
         moveToPosition(x, y);
     } else {
-        m_turretMotor->Set(turretMove);
+        if (xbox->GetBackButton()) {
+            turretPosition = TURRET_LEFT;
+        } else if (xbox->GetBackButton()) {
+            turretPosition = TURRET_RIGHT;
+        } else if (xbox->GetStickButton(GenericHID::JoystickHand::kRightHand)) {
+            turretPosition = TURRET_CENTER;
+        } else {
+            if (turretMove != 0) {
+                turretPosition = TURRET_NONE;
+                m_turretMotor->Set(turretMove);
+            }
+        }
     }
-
+    cout << "\n\nShoulder Angle: " << shoulderAngle << "\n\nElbow Angle" << elbowAngle << "\n\nCur X: " << curX << "\n\nCur Y: " << curY;
     SetMotors();
 }
 
@@ -163,7 +170,7 @@ Arm::moveToPosition(float x, float y)
         elbowAngle = ang2;
         curX = x;
         curY = y;
-        // std::cout << "MOVING TO: x = " << x << ", y = " << y << ", ang1 = " << ang1 << ", ang2 = " << ang2 << "\n";
+        std::cout << "MOVING TO: x = " << x << ", y = " << y << ", ang1 = " << ang1 << ", ang2 = " << ang2 << "\n";
     } else {
         std::cout << "INVALID ANGLE: x = " << x << ", y = " << y << ", ang1 = " << ang1 << ", ang2 = " << ang2 << "\n";
     }
@@ -173,10 +180,10 @@ double
 Arm::computeElbowPosition(double angle)
 {
 #ifdef RED_BOT
-    return -150.796 * angle + 672.796;
+    return -155.796 * angle + 672.796; // New numbers
     // Old numbers: -169.284 * angle + 655.854
 #else
-    // need BLACK_BOT numbers...for now if defined using red
+    // need BLACK_BOT numbers...for now if defi-ned using red
     return -169.284 * angle + 655.854;
 #endif
 }
@@ -201,7 +208,7 @@ Arm::computeShoulderPosition(double angle)
 {
 #ifdef RED_BOT
     return 0.166743 * angle + 0.251658;
-// Old numbers: angle * 0.0837496 + 0.393355
+    // Old numbers: angle * 0.0837496 + 0.393355
 #else // BLACK_BOT
     return angle * 0.163044 + 0.142698;
 #endif
@@ -228,15 +235,26 @@ Arm::SetMotors()
     // to do the PID control loop in software.  Elbow has a fairly large error
     // which varies over the range +/- 20 units.  Shoulder moves slowly to it's
     // position, which may or may not be an issue.
-
-    elbowPosition = computeElbowPosition(elbowAngle);
-    if(validElbowPosition(elbowPosition))
-        m_elbowMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, elbowPosition);
+    fetalPosition = false; //tyemp
+    if (fetalPosition) {
+        // turret PID to center
+        //if turret is at ~center
+            // enable elbow and shoulder movement
+    } else {
+        elbowPosition = computeElbowPosition(elbowAngle);
+        if(validElbowPosition(elbowPosition)) {
+            m_elbowMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, elbowPosition);
+        }
     
-    shoulderPosition = computeShoulderPosition(shoulderAngle);
-    if(validShoulderPosition(shoulderPosition)) {
-        m_shoulderController->SetSetpoint(shoulderPosition);
-        m_shoulderController->SetEnabled(true);
+        shoulderPosition = computeShoulderPosition(shoulderAngle);
+        if(validShoulderPosition(shoulderPosition)) {
+            m_shoulderController->SetSetpoint(shoulderPosition);
+            m_shoulderController->SetEnabled(true);
+        }
+
+        // if (turretPosition != TURRET_NONE) {
+        //     m_turretMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, turretPosition);
+        // }
     }
 }
 
@@ -253,20 +271,13 @@ Arm::FindArmAngles(float x, float y, float *ang1, float *ang2)
 
     //get y and x before r
 	y -= armBaseHeight;
-    x += armBaseFrontX;
+    x += armBaseFrontX - turretOffset;
     r = sqrt(x*x+y*y);
 	*ang2 = acos((highArmLength * highArmLength + lowArmLength * lowArmLength - r * r) / (2 * highArmLength * lowArmLength));
 	*ang1 = acos((lowArmLength * lowArmLength + r * r - highArmLength * highArmLength) / (2 * lowArmLength * r)) + atan(y / x);
     // HERE must find out whether or not the angles are allowed on the robot and return true or false accordingly
     return (*ang1 > 0 && *ang2 > 0);
 }
-
-// void
-// Arm::FindArmMinMax(float base, float *elbowMin, float *elbowMax)
-// {
-// 	*elbowMin = .38*((150.0-base)/.8)+10.0;
-// 	*elbowMax = .45*((150.0-base)/.8)+110.0-*elbowMin;
-// }
 
 void 
 Arm::printInfo()
@@ -284,3 +295,25 @@ Arm::printInfo()
     SmartDashboard::PutNumber("Shoulder position", m_shoulderPot->Get());
     SmartDashboard::PutNumber("Shoulder close loop error", m_shoulderController->GetError());
 }
+
+
+
+// hard coded PID save 
+
+/*if (abs(m_shoulderPot->Get() - (shoulderAngle * 0.163044 + 0.142698)) > .01) { // .1 is a placeholder for how close the motor can get at full power
+        if (m_shoulderPot->Get() > (shoulderAngle * 0.163044 + 0.142698)) {
+            m_shoulderMotor->Set(-1); // too fast?
+        } else {
+            m_shoulderMotor->Set(1); // same
+        }
+    } else {
+        if (abs(m_shoulderPot->Get() - (shoulderAngle * 0.163044 + 0.142698)) > .001) { // .01 is a placeholder for how close to let the motor get without any extra adjustment
+            if (m_shoulderPot->Get() > (shoulderAngle * 0.163044 + 0.142698)) {
+                m_shoulderMotor->Set(-.1); // this is a guess
+            } else {
+                m_shoulderMotor->Set(.1); // also a guess
+            }
+        } else {
+            m_shoulderMotor->Set(0);
+        }
+    }*/
