@@ -58,7 +58,7 @@ Arm::ArmInit()
     curX = 609.6; // This is temporary
     curY = 914.4; // Same (36 in)
     moveToPosition(curX, curY);
-    // fetalPosition = true;
+    // startPosition = true;
     turretPosition = TURRET_NONE; // maybe change this
 }
 
@@ -139,7 +139,7 @@ Arm::Tick(XboxController *xbox, POVButton *dPad[])
     } else if (xbox->GetTriggerAxis(GenericHID::JoystickHand::kRightHand) > .1) {
         // x =
         // y =
-        fetalPosition = true;
+        startPosition = true;
         turretPosition = TURRET_CENTER;
     } else {
         move = false;
@@ -151,7 +151,7 @@ Arm::Tick(XboxController *xbox, POVButton *dPad[])
     } else {
         if (xbox->GetBackButton()) {
             turretPosition = TURRET_LEFT;
-        } else if (xbox->GetBackButton()) {
+        } else if (xbox->GetStartButton()) {
             turretPosition = TURRET_RIGHT;
         } else if (xbox->GetStickButton(GenericHID::JoystickHand::kRightHand)) {
             turretPosition = TURRET_CENTER;
@@ -241,8 +241,8 @@ Arm::SetMotors()
     // to do the PID control loop in software.  Elbow has a fairly large error
     // which varies over the range +/- 20 units.  Shoulder moves slowly to it's
     // position, which may or may not be an issue.
-    fetalPosition = false; //tyemp
-    if (fetalPosition) {
+    startPosition = false; //tyemp
+    if (startPosition) {
         // turret PID to center
         //if turret is at ~center
             // enable elbow and shoulder movement
