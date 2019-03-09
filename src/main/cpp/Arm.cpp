@@ -95,7 +95,7 @@ Arm::Tick(XboxController *xbox, POVButton *dPad[])
             y = cargoBallHeight; 
         } else if (dPad[L]->Get()) {
             // Place hatch at cargo ship
-            x = 509.737;
+            x = defaultX;
             y = cargoHatchHeight;
         } else if (dPad[B]->Get()) {
             // Place ball low
