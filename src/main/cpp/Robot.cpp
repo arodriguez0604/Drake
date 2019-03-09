@@ -12,7 +12,6 @@
 #include <iostream>
 #include "Drake.h"
 
-
 void
 Robot::RobotInit() 
 {  
@@ -20,9 +19,9 @@ Robot::RobotInit()
     m_leftStick  = new frc::Joystick(1);
     //m_rightStick = new frc::Joystick(2);
     m_xbox       = new frc::XboxController(3);
-    m_dPad[R]    = new frc::POVButton(*m_xbox, 270);
+    m_dPad[R]    = new frc::POVButton(*m_xbox, 90);
     m_dPad[T]    = new frc::POVButton(*m_xbox, 0);
-    m_dPad[L]    = new frc::POVButton(*m_xbox, 90);
+    m_dPad[L]    = new frc::POVButton(*m_xbox, 270);
     m_dPad[B]    = new frc::POVButton(*m_xbox, 180);
 
     m_arm = new Arm(SHOULDER_MOTOR, ELBOW_MOTOR, TURRET_MOTOR, 0);
@@ -83,6 +82,9 @@ Robot::TeleopInit()
 void
 Robot::TeleopPeriodic()
 {
+    SmartDashboard::PutBoolean("Dpad[L]", m_dPad[L]->Get());
+
+
     bool calibrated = !(ahrs->IsCalibrating());
     SmartDashboard::PutBoolean("NAV-X calibrated", calibrated);
 
