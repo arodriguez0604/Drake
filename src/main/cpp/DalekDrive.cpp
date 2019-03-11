@@ -216,6 +216,12 @@ DalekDrive::Cartesian(frc::Joystick* stick,	double gyroAngle)
 		x = stick->GetX(); x = squareInput(DeadZone(x, .1));
 		y = stick->GetY(); y = squareInput(DeadZone(y, .1));
 		z = stick->GetTwist(); z = squareInput(squareInput(DeadZone(z, .1))) / 5;
+		// if (stick->GetButton(Joystick::ButtonType::kTriggerButton)) {
+		// 	x /= 1000;
+		// 	y /= 1000;
+		// 	z /= 1000;
+		// 	cout << "SHOULD BE LOWERING\n";
+		// }
 		m_mecanum->DriveCartesian(-x, y, -z, gyroAngle);
 	}
 }
