@@ -40,6 +40,8 @@ Arm::ArmInit()
 	m_elbowMotor->Config_kI(0, 0.001, 0);
     m_elbowMotor->Config_kD(0, 4.0, 0);
     m_elbowMotor->ConfigClosedloopRamp(0.75);
+    m_elbowMotor->ConfigPeakCurrentDuration(100);
+    m_elbowMotor->ConfigPeakCurrentLimit(40);
 
     // shoulder motor PID control
     m_shoulderController->SetPID(7.0, 0.0, 0.0);
@@ -47,12 +49,16 @@ Arm::ArmInit()
     m_shoulderController->Reset();
 
  	m_shoulderMotor->SetIdleMode(CANSparkMax::IdleMode::kBrake);
-    m_shoulderMotor->SetSmartCurrentLimit(60, 2, 0);
+    m_shoulderMotor->SetSmartCurrentLimit(40, 2, 0);
 	m_shoulderMotor->SetOpenLoopRampRate(0.5);
 
+    m_turretMotor->SetNeutralMode(NeutralMode::Brake);
     m_turretMotor->ConfigSelectedFeedbackSensor(FeedbackDevice::Analog, 0, 0);
     m_turretMotor->ConfigFeedbackNotContinuous(true);
     m_turretMotor->ConfigAllowableClosedloopError(0, 0, 0);
+    m_turretMotor->ConfigPeakCurrentDuration(100);
+    m_turretMotor->ConfigPeakCurrentLimit(40);
+    m_turretMotor->ConfigClosedloopRamp(0.5);
 
     //find the location soon and set it
     curX = 609.6; // This is temporary
