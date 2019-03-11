@@ -58,6 +58,7 @@ Arm::ArmInit()
     curY = 609.6;
     moveToPosition(curX, curY);
     startPosition = false;
+    startPositionReal = false;
     turretPosition = TURRET_NONE;
     // eventually replace this by somehow going to the starting position
 }
@@ -141,8 +142,8 @@ Arm::Tick(XboxController *xbox, POVButton *dPad[])
         turretPosition = TURRET_CENTER;
     } else {
         move = false;
-        elbowAngle += (DeadZone(xbox->GetY(GenericHID::JoystickHand::kRightHand), .4) * -.01); // maybe change 6
-        shoulderAngle += (DeadZone(xbox->GetY(GenericHID::JoystickHand::kLeftHand), .4) * .02);  // same as above
+        elbowAngle += (DeadZone(xbox->GetY(GenericHID::JoystickHand::kRightHand), .4) * -.01);
+        shoulderAngle += (DeadZone(xbox->GetY(GenericHID::JoystickHand::kLeftHand), .4) * .02);
     }
     if (move) {
         moveToPosition(x, y);
@@ -246,8 +247,8 @@ Arm::SetMotors()
     // position, which may or may not be an issue.
     SmartDashboard::PutNumber("calcX", turretOffset - armBaseFrontX + lowArmLength * cos(shoulderAngle) + highArmLength * cos(shoulderAngle + elbowAngle - M_PI));
     SmartDashboard::PutNumber("calcY", armBaseHeight + lowArmLength * sin(shoulderAngle) + highArmLength * sin(shoulderAngle + elbowAngle - M_PI));
+    float yHeight = armBaseHeight + lowArmLength * sin(shoulderAngle) + highArmLength * sin(shoulderAngle + elbowAngle - M_PI);
     if (startPosition) {
-        float yHeight = armBaseHeight + lowArmLength * sin(shoulderAngle) + highArmLength * sin(shoulderAngle + elbowAngle - M_PI);
         // TODO go straingt to else if we are at the center already
         if (abs(m_turretMotor->GetSelectedSensorPosition(0) - TURRET_CENTER) > 20 && (yHeight < yClearance || (curY == yClearance + 125 && curX == 150 && abs(computeShoulderPosition(shoulderAngle) - m_shoulderPot->Get()) >= .001))) {
             curX = 150;
@@ -258,15 +259,17 @@ Arm::SetMotors()
         } else {
             if (HardPID(m_turretMotor, m_turretMotor->GetSelectedSensorPosition(0), TURRET_CENTER, 20, 3.5)) {
                 startPosition = false;
+                startPositionReal = true;
                 curX = startPositionX;
                 curY = startPositionY;
                 moveToPosition(curX, curY);
             }
         }  
     } else {
-        if (curX == startPositionX && curY == startPositionY && turretPosition == TURRET_CENTER) {
+        if (startPositionReal) {
             if (HardPID(m_shoulderMotor, m_shoulderPot->Get(), computeShoulderPosition(shoulderAngle), .01, .001)) {
                 m_elbowMotor->Set(ctre::phoenix::motorcontrol::ControlMode::Position, computeElbowPosition(elbowAngle));
+                startPositionReal = false;
             }
         } else {
             elbowPosition = computeElbowPosition(elbowAngle);
