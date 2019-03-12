@@ -26,25 +26,21 @@ Robot::RobotInit()
 
     m_arm = new Arm(SHOULDER_MOTOR, ELBOW_MOTOR, TURRET_MOTOR, 0);
     m_claw = new Claw(CLAW_MOTOR, 0);
+    CameraServer::GetInstance()->StartAutomaticCapture();
 
 #ifdef USE_LIDAR
     microLidar = new MicroLidar("/dev/i2c-2", MicroLidar::CONTINUOUS_MEASURE_MODE);
-    if (!microLidar) {
         for (int i = 0; i < LIDAR_COUNT; i++) {
             microLidar->Add(i);
         }
         microLidar->InitSensors();
         microLidar->StartMeasurements();
-    }
-    else {
-        std::cout << "Failed to initialize microLidars\n";
-    }
 #endif
     lineSensor = new LineSensor();
     dalekShuffleboard = new DalekShuffleboard(microLidar, lineSensor);
     ahrs = new AHRS(SPI::Port::kMXP);
     
-    // CameraServer::GetInstance()->StartAutomaticCapture();
+    CameraServer::GetInstance()->StartAutomaticCapture();
 }
 
 void
@@ -81,9 +77,6 @@ Robot::TeleopInit()
 void
 Robot::TeleopPeriodic()
 {
-    SmartDashboard::PutBoolean("Dpad[L]", m_dPad[L]->Get());
-
-
     bool calibrated = !(ahrs->IsCalibrating());
     SmartDashboard::PutBoolean("NAV-X calibrated", calibrated);
 
