@@ -61,11 +61,12 @@ class Arm {
 
     Arm(int shoulderMotor, int elbowMotor, int turretMotor, int shoulderPot);
     Arm(CANSparkMax *shoulderMotor, WPI_TalonSRX *elbowMotor, 
-          WPI_TalonSRX *turretMotor, AnalogPotentiometer *shoulderPot);
+        WPI_TalonSRX *turretMotor, AnalogPotentiometer *shoulderPot, MicroLidar *microLidar);
 
     void Tick(XboxController *xbox, POVButton *dPad[4]);
     void moveToPosition(float x, float y);
     void printInfo();
+    void ProximityDistance(int frontSensor, int rearSensor);
   
   private:
     CANSparkMax *m_shoulderMotor;
@@ -73,6 +74,7 @@ class Arm {
     WPI_TalonSRX *m_elbowMotor, *m_turretMotor;
     AnalogPotentiometer *m_shoulderPot;
     PIDController *m_shoulderController;
+    MicroLidar *microLidar;
 
     void SetMotors();
     void ArmInit();

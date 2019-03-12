@@ -27,7 +27,7 @@ Robot::RobotInit()
     m_arm = new Arm(SHOULDER_MOTOR, ELBOW_MOTOR, TURRET_MOTOR, 0);
     m_claw = new Claw(CLAW_MOTOR, 0);
 
-#if USE_LIDAR
+#ifdef USE_LIDAR
     microLidar = new MicroLidar("/dev/i2c-2", MicroLidar::CONTINUOUS_MEASURE_MODE);
     if (!microLidar) {
         for (int i = 0; i < LIDAR_COUNT; i++) {
@@ -50,7 +50,7 @@ Robot::RobotInit()
 void
 Robot::RobotPeriodic() 
 {
-#if USE_LIDAR
+#ifdef USE_LIDAR
     microLidar->PollDevices();
 #endif
     dalekShuffleboard->continious();

@@ -14,7 +14,7 @@ Arm::Arm(int shoulderMotor, int elbowMotor, int turretMotor, int shoulderPot)
     ArmInit();
 }
 
-Arm::Arm(CANSparkMax *shoulderMotor, WPI_TalonSRX *elbowMotor, WPI_TalonSRX *turretMotor, AnalogPotentiometer *shoulderPot)
+Arm::Arm(CANSparkMax *shoulderMotor, WPI_TalonSRX *elbowMotor, WPI_TalonSRX *turretMotor, AnalogPotentiometer *shoulderPot, MicroLidar *microLidar)
 {
     m_shoulderMotor        = shoulderMotor;
     m_elbowMotor           = elbowMotor;
@@ -22,6 +22,7 @@ Arm::Arm(CANSparkMax *shoulderMotor, WPI_TalonSRX *elbowMotor, WPI_TalonSRX *tur
     m_shoulderPot          = shoulderPot;
     m_shoulderMotorEncoder = new CANEncoder(*m_shoulderMotor);
     m_shoulderController   = new PIDController(0.0, 0.0, 0.0, m_shoulderPot, m_shoulderMotor);
+    this->microLidar = microLidar;
     ArmInit();
 }
 
@@ -324,3 +325,20 @@ Arm::printInfo()
             m_shoulderMotor->Set(0);
         }
     }*/
+
+void
+Arm::ProximityDistance(int frontSensor, int rearSensor) {
+    frontSensor = microLidar->GetMeasurement(2);
+    rearSensor = microLidar->GetMeasurement(3);
+    float x = 234.95;
+    float y = 190.5;
+    float dist = 406.4;
+    
+
+    if (frontSensor > rearSensor) {
+        float angle = M_PI / 2 + atan((frontSensor - rearSensor) / dist);
+    }
+    else {
+        float angle = M_PI / 2 - atan((rearSensor - frontSensor) / dist);
+    }
+}
