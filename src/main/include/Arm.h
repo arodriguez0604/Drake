@@ -74,6 +74,7 @@ class Arm {
     void moveToPosition(float x, float y);
     void printInfo();
     void ProximityDistance(int frontSensor, int rearSensor);
+    float radiansToDegrees (float degrees);
   
   private:
     CANSparkMax *m_shoulderMotor;
@@ -95,4 +96,3 @@ class Arm {
     // void FindArmMinMax(float base, float *elbowMin, float *elbowMax);
     float DeadZone(float input, float range);
 };
-

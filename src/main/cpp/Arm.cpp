@@ -390,15 +390,23 @@ bool Arm::HardPID(WPI_TalonSRX *motor, float currentPosition, float finalPositio
 
 void
 Arm::ProximityDistance(int frontSensor, int rearSensor) {
-    frontSensor = microLidar->GetMeasurement(2);
-    rearSensor = microLidar->GetMeasurement(3);
     int angle;
 
     if (frontSensor > rearSensor) {
-        angle = int(M_PI / 2) + int(atan((frontSensor - rearSensor) / sensorFrontToBack));
+        angle = int(M_PI / 2 + atan((frontSensor - rearSensor) / sensorFrontToBack));
     }
     else if (rearSensor > frontSensor) {
-        angle = int(M_PI / 2) - int(atan((rearSensor - frontSensor) / sensorFrontToBack));
+        angle = int(M_PI / 2 - atan((rearSensor - frontSensor) / sensorFrontToBack));
     }
+    angle = radiansToDegrees (angle);
     SmartDashboard::PutNumber("Angle", angle); //Testing Only
+}
+
+//Converts Radians to Degrees
+float
+Arm::radiansToDegrees (float radians) {
+    float degrees;
+
+    degrees = 1.586 * (180 / M_PI);
+    return degrees;
 }
