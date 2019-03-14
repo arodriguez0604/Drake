@@ -95,19 +95,6 @@ Robot::TeleopPeriodic()
     m_arm->printInfo();
     m_claw->printVoltage();
 
-    /*bool line = lineSensor->getLineSensor(1);
-        
-        if(m_leftStick->GetTrigger()){
-            if(!line){
-                m_drive->SetLeftRightMotorOutputs(0.05, -0.05);
-            }
-            else{
-                m_drive->SetLeftRightMotorOutputs(0.0, 0.0);
-            }
-        }
-        else{
-            m_drive->SetLeftRightMotorOutputs(0.0, 0.0);
-        }*/
 }
 
 void
