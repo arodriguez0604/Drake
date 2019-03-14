@@ -173,6 +173,17 @@ Arm::Tick(XboxController *xbox, POVButton *dPad[])
         SmartDashboard::PutNumber("turret move", turretMove);
         SmartDashboard::PutNumber("turret position", turretPosition);
     }
+    #ifdef USE_LIDAR
+        if (xbox->GetAButton()){
+            m_turretMotor->SetSelectedSensorPosition(ProximityDistance(microLidar->GetMeasurement(2), microLidar->GetMeasurement(3)));
+        }
+        else if (xbox->GetBButton()){
+            m_turretMotor->SetSelectedSensorPosition(ProximityDistance(microLidar->GetMeasurement(0), microLidar->GetMeasurement(1)));
+        }
+        else if (xbox->GetXButton()){
+            m_turretMotor->SetSelectedSensorPosition(ProximityDistance(microLidar->GetMeasurement(4), microLidar->GetMeasurement(5)));
+        }
+    #endif
     // cout << "\n\nShoulder Angle: " << shoulderAngle << "\n\nElbow Angle" << elbowAngle << "\n\nCur X: " << curX << "\n\nCur Y: " << curY;
     SetMotors();
 }
@@ -388,18 +399,19 @@ bool Arm::HardPID(WPI_TalonSRX *motor, float currentPosition, float finalPositio
     return false;
 }
 
-void
+float
 Arm::ProximityDistance(int frontSensor, int rearSensor) {
-    int angle;
+    float angle;
 
     if (frontSensor > rearSensor) {
-        angle = int(M_PI / 2 + atan((frontSensor - rearSensor) / sensorFrontToBack));
+        angle = M_PI / 2 + atan((frontSensor - rearSensor) / sensorFrontToBack);
     }
     else if (rearSensor > frontSensor) {
-        angle = int(M_PI / 2 - atan((rearSensor - frontSensor) / sensorFrontToBack));
+        angle = M_PI / 2 - atan((rearSensor - frontSensor) / sensorFrontToBack);
     }
     angle = radiansToDegrees (angle);
     SmartDashboard::PutNumber("Angle", angle); //Testing Only
+    return angle;
 }
 
 //Converts Radians to Degrees

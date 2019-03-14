@@ -73,7 +73,7 @@ class Arm {
     void Tick(XboxController *xbox, POVButton *dPad[4]);
     void moveToPosition(float x, float y);
     void printInfo();
-    void ProximityDistance(int frontSensor, int rearSensor);
+    float ProximityDistance(int frontSensor, int rearSensor);
     float radiansToDegrees (float degrees);
   
   private:
