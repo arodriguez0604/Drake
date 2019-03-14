@@ -14,7 +14,7 @@ Arm::Arm(int shoulderMotor, int elbowMotor, int turretMotor, int shoulderPot)
     ArmInit();
 }
 
-Arm::Arm(CANSparkMax *shoulderMotor, WPI_TalonSRX *elbowMotor, WPI_TalonSRX *turretMotor, AnalogPotentiometer *shoulderPot, MicroLidar *microLidar) //TurretPot *turretPot)
+Arm::Arm(CANSparkMax *shoulderMotor, WPI_TalonSRX *elbowMotor, WPI_TalonSRX *turretMotor, AnalogPotentiometer *shoulderPot, MicroLidar *microLidar)
 {
     m_shoulderMotor        = shoulderMotor;
     m_elbowMotor           = elbowMotor;
@@ -22,7 +22,7 @@ Arm::Arm(CANSparkMax *shoulderMotor, WPI_TalonSRX *elbowMotor, WPI_TalonSRX *tur
     m_shoulderPot          = shoulderPot;
     m_shoulderMotorEncoder = new CANEncoder(*m_shoulderMotor);
     m_shoulderController   = new PIDController(0.0, 0.0, 0.0, m_shoulderPot, m_shoulderMotor);
-    this->microLidar = microLidar;
+    this->microLidar       = microLidar;
     ArmInit();
 }
 
@@ -419,6 +419,6 @@ float
 Arm::radiansToDegrees (float radians) {
     float degrees;
 
-    degrees = 1.586 * (180 / M_PI);
+    degrees = 1.586 * (radians) * (180 / M_PI);
     return degrees;
 }
