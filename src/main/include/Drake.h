@@ -8,7 +8,6 @@
 #pragma once
 
 #define RED_BOT
-#define USE_LIDAR
 
 #include <string>
 #include <frc/WPILib.h>
@@ -17,6 +16,7 @@
 #include <AHRS.h>
 #include "frc/smartdashboard/SmartDashboard.h"
 #include "DalekDrive.h"
+#include "MicroLidar.h"
 #include "DalekShuffleboard.h"
 #include "LineSensor.h"
 #include "Arm.h"
@@ -24,15 +24,11 @@
 #include "MicroLidar.h"
 #include "DalekShuffleboard.h"
 #include "LineSensor.h"
-/*
-#define FirstRocketPanel 48.26
 
-enum m_Stick [1, 2]
-
-*m_leftStick = new frc::m_Stick(1);
-*/
 class Robot : public frc::TimedRobot {
  public:
+  //bool firstRunPosition;
+
   void RobotInit() override;
   void RobotPeriodic() override;
   void AutonomousInit() override;

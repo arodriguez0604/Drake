@@ -213,15 +213,16 @@ DalekDrive::Cartesian(frc::Joystick* stick,	double gyroAngle)
 {
 	if(m_type == DalekDrive::driveType::kMecanum) {
 		double x, y, z;
+		double twistAdjustment = 5;
 		x = stick->GetX(); x = squareInput(DeadZone(x, .1));
 		y = stick->GetY(); y = squareInput(DeadZone(y, .1));
-		z = stick->GetTwist(); z = squareInput(squareInput(DeadZone(z, .1))) / 5;
-		// if (stick->GetButton(Joystick::ButtonType::kTriggerButton)) {
-		// 	x /= 1000;
-		// 	y /= 1000;
-		// 	z /= 1000;
-		// 	cout << "SHOULD BE LOWERING\n";
-		// }
+		twistAdjustment = -2 * abs(y) + 4; // This equation should speed up turning speed as y speeds up
+		z = stick->GetTwist(); z = squareInput(squareInput(DeadZone(z, .1))) / twistAdjustment;
+		if(stick->GetTrigger()) {
+			x *= .3;
+			y *= .3;
+			z *= .3;
+		}
 		m_mecanum->DriveCartesian(-x, y, -z, gyroAngle);
 	}
 }
@@ -345,7 +346,7 @@ bool
 DalekDrive::DriveOk()
 {
 	int mstat;
-
+#ifdef MOTOR_PRINT
 	// update dashboard of current draw for motors
 	frc::SmartDashboard::PutNumber("Left Front current", 
 		m_leftMotor[FRONT]->GetOutputCurrent());
@@ -364,6 +365,7 @@ DalekDrive::DriveOk()
 		m_rightMotor[REAR]->GetOutputCurrent());
 	frc::SmartDashboard::PutNumber("Right Rear Encoder position",
 		m_rightEncoder[REAR]->GetPosition());
+	#endif
 
 	// check for motor faults
 	mstat = m_leftMotor[FRONT]->GetFaults();
@@ -388,4 +390,42 @@ DalekDrive::DriveOk()
 		return false;
 	}
 	return true;
+}
+
+//Use SetLeftRightMotorOutputs(double leftOutput, double rightOutput) instead of using these single ones
+void
+DalekDrive::DriveBaseSquare(int leftSensor, int rightSensor) {
+	#ifdef USE_LIDAR
+		if (LidarInRange (leftSensor, rightSensor)) {
+			if (rightSensor + LidarError > leftSensor || rightSensor - LidarError > leftSensor) {
+				//Turn left
+				SetLeftRightMotorOutputs(PositiveMotorSpeed, NegativeMotorSpeed);
+			}
+			else if (leftSensor + LidarError > rightSensor || leftSensor - LidarError > rightSensor) {
+				//Turn Right
+				SetLeftRightMotorOutputs(NegativeMotorSpeed, PositiveMotorSpeed);
+			}
+			else {
+				//STOP!
+				SetLeftRightMotorOutputs(NullMotorSpeed, NullMotorSpeed);
+			}
+			SmartDashboard::PutNumber("Left Motor Master", m_leftMotor[FRONT]->Get());
+			SmartDashboard::PutNumber("Left Motor Slave", m_leftMotor[REAR]->Get());
+			SmartDashboard::PutNumber("Left Motor Master", m_leftMotor[FRONT]->Get());
+			SmartDashboard::PutNumber("Left Motor Slave", m_leftMotor[REAR]->Get());
+		}
+	#endif
+}
+
+bool
+DalekDrive::LidarInRange (int sensorOne, int sensorTwo) {
+	#ifdef USE_LIDAR
+		if (sensorOne >= 1000 || sensorTwo >= 1000) {
+			SmartDashboard::PutBoolean("Lidar Status", 0);
+			return false;
+		}
+		//If less than 1000
+		SmartDashboard::PutBoolean("Lidar Status", 1);
+		return true;
+	#endif
 }

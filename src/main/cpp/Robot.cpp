@@ -14,7 +14,7 @@
 
 void
 Robot::RobotInit() 
-{  
+{   
     m_drive      = new DalekDrive(1, 2, 3, 4, DalekDrive::driveType::kMecanum);
     m_leftStick  = new frc::Joystick(1);
     //m_rightStick = new frc::Joystick(2);
@@ -26,7 +26,7 @@ Robot::RobotInit()
 
     m_arm = new Arm(SHOULDER_MOTOR, ELBOW_MOTOR, TURRET_MOTOR, 0);
     m_claw = new Claw(CLAW_MOTOR, 0);
-    CameraServer::GetInstance()->StartAutomaticCapture();
+    // CameraServer::GetInstance()->StartAutomaticCapture();
 
 #ifdef USE_LIDAR
     microLidar = new MicroLidar("/dev/i2c-2", MicroLidar::CONTINUOUS_MEASURE_MODE);
@@ -40,8 +40,9 @@ Robot::RobotInit()
     dalekShuffleboard = new DalekShuffleboard(microLidar, lineSensor);
     ahrs = new AHRS(SPI::Port::kMXP);
     
-    CameraServer::GetInstance()->StartAutomaticCapture();
+    //CameraServer::GetInstance()->StartAutomaticCapture();
 }
+
 
 void
 Robot::RobotPeriodic() 
@@ -55,16 +56,13 @@ Robot::RobotPeriodic()
 void
 Robot::AutonomousInit() 
 {
-     ahrs->ZeroYaw();
+    TeleopInit();
 }
 
 void
 Robot::AutonomousPeriodic()
 {
-    static int step = 0;
-    if(step == 0) {
-        
-    }
+    TeleopPeriodic();
 }
 
 void
@@ -77,8 +75,11 @@ Robot::TeleopInit()
 void
 Robot::TeleopPeriodic()
 {
+    SmartDashboard::PutBoolean("Dpad[L]", m_dPad[L]->Get());
+
     bool calibrated = !(ahrs->IsCalibrating());
-    SmartDashboard::PutBoolean("NAV-X calibrated", calibrated);
+  //  SmartDashboard::PutBoolean("NAV-X calibrated", calibrated);
+   // SmartDashboard::PutBoolean("Dpad[L]", m_dPad[L]->Get());
 
     // pick one to test, all should in principle work for the mecanum wheels
     // m_drive->TankDrive(m_leftStick, m_rightStick, false);
@@ -86,8 +87,13 @@ Robot::TeleopPeriodic()
     // m_drive->Cartesian(m_leftStick, m_rightStick, 0.0);
     // m_drive->SetLeftRightMotorOutputs(m_leftStick->GetY(), -m_rightStick->GetY());
     if(calibrated) {
-        SmartDashboard::PutNumber("Robot Heading", ahrs->GetFusedHeading());
-        m_drive->Cartesian(m_leftStick, 0.0);
+        //SmartDashboard::PutNumber("Robot Heading", ahrs->GetFusedHeading());
+         if (m_leftStick->GetRawButton(2)) {
+		     m_drive->DriveBaseSquare(microLidar->GetMeasurement(0), microLidar->GetMeasurement(1));
+	     }
+         else {
+            m_drive->Cartesian(m_leftStick, 0.0);
+        }
         m_claw->Tick(m_xbox);
         m_arm->Tick(m_xbox, m_dPad);
     }    
@@ -95,6 +101,19 @@ Robot::TeleopPeriodic()
     m_arm->printInfo();
     m_claw->printVoltage();
 
+    /*bool line = lineSensor->getLineSensor(1);
+        
+        if(m_leftStick->GetTrigger()){
+            if(!line){
+                m_drive->SetLeftRightMotorOutputs(0.05, -0.05);
+            }
+            else{
+                m_drive->SetLeftRightMotorOutputs(0.0, 0.0);
+            }
+        }
+        else{
+            m_drive->SetLeftRightMotorOutputs(0.0, 0.0);
+        }*/
 }
 
 void

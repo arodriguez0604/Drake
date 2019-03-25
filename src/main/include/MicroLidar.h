@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "VL53L0X.h"
@@ -8,7 +7,7 @@
 
 #define CALIBRATION_DISTANCE_MM 200
 
-#define LIDAR_COUNT 6
+#define LIDAR_COUNT 2
 
 /*
  * Example
@@ -65,4 +64,3 @@ private:
     VL53L0X *Devices[MAX_MICROLIDAR_DEVICE_COUNT];
     frc::DigitalOutput *DigGpio[MAX_MICROLIDAR_DEVICE_COUNT];
 };
-

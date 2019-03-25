@@ -49,8 +49,8 @@ void DalekShuffleboard::continious()
         frc::SmartDashboard::PutNumber(temp, microLidar->GetMeasurement(i));
    }
 #endif
-    for (int i = 0; i < LINE_SENSOR_COUNT; i++) {
-        std::string temp = "Line Sensor: "+ std::to_string(i);
-        frc::SmartDashboard::PutBoolean(temp, lineSensor->getLineSensor(i));
-    }
+  //  for (int i = 0; i < LINE_SENSOR_COUNT; i++) {
+    //    std::string temp = "Line Sensor: "+ std::to_string(i);
+      //  frc::SmartDashboard::PutBoolean(temp, lineSensor->getLineSensor(i));
+    //}
 }

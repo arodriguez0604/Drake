@@ -9,6 +9,7 @@
  * Utility class for handling Robot drive 
  */
 #pragma once
+// #define MOTOR_PRINT
 
 #define CAN_TIMEOUT 100
 #define STALL_LIMIT 60
@@ -19,6 +20,11 @@
 #define FRONT       0
 #define REAR        1
 #define NUM_MOTORS_PER_SIDE 2
+#define sensorFrontToBack         406.4
+#define PositiveMotorSpeed 		  .2
+#define NegativeMotorSpeed		  -.2
+#define NullMotorSpeed			  0
+#define LidarError				  30
 
 class DalekDrive {
   public:
@@ -56,11 +62,14 @@ class DalekDrive {
 	void SetInvertedMotor(int side, bool isInverted);
 	bool DriveOk();
 
+	void DriveBaseSquare(int leftSensor, int RightSensor);
+
  private:
 	void InitDalekDrive();
 	double squareInput(double v);
 	void printFaults(int side, int faults);
 	float DeadZone(float input, float range);
+	bool LidarInRange (int sensorOne, int sensorTwo);
 	rev::CANSparkMax *m_leftMotor[NUM_MOTORS_PER_SIDE];
 	rev::CANSparkMax *m_rightMotor[NUM_MOTORS_PER_SIDE];
     frc::SpeedControllerGroup *m_left;
