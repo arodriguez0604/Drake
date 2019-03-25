@@ -60,6 +60,5 @@
     "complex": "cpp",
     "string": "cpp"
   },
-  "C_Cpp.default.configurationProvider": "vscode-wpilib",
   "C_Cpp.dimInactiveRegions": false
 }
