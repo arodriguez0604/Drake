@@ -63,13 +63,13 @@ class DalekDrive {
 	bool DriveOk();
 
 	void DriveBaseSquare(int leftSensor, int RightSensor);
+	bool LidarInRange (int sensorOne, int sensorTwo);
 
  private:
 	void InitDalekDrive();
 	double squareInput(double v);
 	void printFaults(int side, int faults);
 	float DeadZone(float input, float range);
-	bool LidarInRange (int sensorOne, int sensorTwo);
 	rev::CANSparkMax *m_leftMotor[NUM_MOTORS_PER_SIDE];
 	rev::CANSparkMax *m_rightMotor[NUM_MOTORS_PER_SIDE];
     frc::SpeedControllerGroup *m_left;

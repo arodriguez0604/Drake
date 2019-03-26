@@ -409,6 +409,7 @@ DalekDrive::DriveBaseSquare(int leftSensor, int rightSensor) {
 				//STOP!
 				SetLeftRightMotorOutputs(NullMotorSpeed, NullMotorSpeed);
 			}
+			//Testing Purposes Only
 			SmartDashboard::PutNumber("Left Motor Master", m_leftMotor[FRONT]->Get());
 			SmartDashboard::PutNumber("Left Motor Slave", m_leftMotor[REAR]->Get());
 			SmartDashboard::PutNumber("Left Motor Master", m_leftMotor[FRONT]->Get());
@@ -421,11 +422,9 @@ bool
 DalekDrive::LidarInRange (int sensorOne, int sensorTwo) {
 	#ifdef USE_LIDAR
 		if (sensorOne >= 1000 || sensorTwo >= 1000) {
-			SmartDashboard::PutBoolean("Lidar Status", 0);
 			return false;
 		}
 		//If less than 1000
-		SmartDashboard::PutBoolean("Lidar Status", 1);
 		return true;
 	#endif
 }

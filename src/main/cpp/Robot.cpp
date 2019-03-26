@@ -87,13 +87,14 @@ Robot::TeleopPeriodic()
     // m_drive->Cartesian(m_leftStick, m_rightStick, 0.0);
     // m_drive->SetLeftRightMotorOutputs(m_leftStick->GetY(), -m_rightStick->GetY());
     if(calibrated) {
+        //SmartDashboard::PutBoolean("Lidar in Range", m_drive->LidarInRange(microLidar->GetMeasurement(0), microLidar->GetMeasurement(1)));
         //SmartDashboard::PutNumber("Robot Heading", ahrs->GetFusedHeading());
-         if (m_leftStick->GetRawButton(2)) {
-		     m_drive->DriveBaseSquare(microLidar->GetMeasurement(0), microLidar->GetMeasurement(1));
-	     }
-         else {
+        //  if (m_leftStick->GetRawButton(2)) {
+		//      m_drive->DriveBaseSquare(microLidar->GetMeasurement(0), microLidar->GetMeasurement(1));
+	    //  }
+        //  else {
             m_drive->Cartesian(m_leftStick, 0.0);
-        }
+        //  }
         m_claw->Tick(m_xbox);
         m_arm->Tick(m_xbox, m_dPad);
     }    

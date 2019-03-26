@@ -7,6 +7,7 @@
 
 #pragma once
 
+// #define USE_LIDAR
 #define RED_BOT
 
 #include <string>
